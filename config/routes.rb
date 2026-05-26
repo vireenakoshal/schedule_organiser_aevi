@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   root "schedules#index"
 
-  resources :schedules, only: [:index, :show, :create, :destroy] do
+  resources :schedules, only: [:index, :show, :create] do
     resources :tasks, only: [:new, :create, :edit, :update, :destroy]
     resources :messages, only: [:create]
   end
