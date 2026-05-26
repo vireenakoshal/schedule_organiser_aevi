@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_25_154905) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_26_100036) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "messages", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.string "role"
+    t.bigint "schedule_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["schedule_id"], name: "index_messages_on_schedule_id"
+  end
+
+  create_table "schedules", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_schedules_on_user_id"
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.integer "duration_min"
+    t.time "fixed_time"
+    t.time "preferred_time"
+    t.bigint "schedule_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["schedule_id"], name: "index_tasks_on_schedule_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -25,4 +53,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_25_154905) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "messages", "schedules"
+  add_foreign_key "schedules", "users"
+  add_foreign_key "tasks", "schedules"
 end
