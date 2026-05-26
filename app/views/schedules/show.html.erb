@@ -1,104 +1,216 @@
-<div style="background: #f5f1ed; min-height: 100vh; padding: 40px 20px;">
-  <div style="max-width: 600px; margin: 0 auto;">
-    <!-- Header -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-      <%= link_to "← Back", schedules_path, style: "color: #d97c3a; text-decoration: none; font-weight: 600;" %>
-      <div style="text-align: right;">
-        <p style="color: #999; font-size: 12px; text-transform: uppercase; margin: 0 0 4px 0;">🤖 AI OPTIMIZED</p>
-        <h1 style="font-size: 32px; font-weight: 700; color: #2d2d2d; margin: 0;"><%= @schedule.date.strftime("%A, %b %d") %></h1>
-      </div>
-    </div>
+<style>
+  body {
+    background-color: #F5F0E8;
+    font-family: 'Georgia', serif;
+  }
 
-    <!-- Today's Flow -->
-    <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2 style="font-size: 16px; font-weight: 600; color: #2d2d2d; margin: 0; text-transform: uppercase;">TODAY'S FLOW</h2>
-        <span style="color: #999; font-size: 12px; cursor: pointer;">Drag to reorder</span>
-      </div>
+  .page-wrapper {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
 
-      <% if @tasks.any? %>
-        <% @tasks.each do |task| %>
-          <div style="display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid #f0f0f0; cursor: move;">
-            <span style="color: #ccc; font-size: 20px;">☰</span>
-            <div style="flex: 1;">
-              <p style="font-weight: 600; color: #2d2d2d; margin: 0; font-size: 15px;"><%= task.title %></p>
-              <p style="color: #999; font-size: 12px; margin: 4px 0 0 0;"><span style="color: #d97c3a;">⏱</span> <%= task.status %></p>
-            </div>
-            <span style="background: #fff3e0; color: #d97c3a; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;"><%= task.status %></span>
-          </div>
-        <% end %>
-      <% else %>
-        <p style="color: #999; text-align: center; padding: 20px 0; margin: 0;">No tasks yet.</p>
-      <% end %>
+  .label-small {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #C1713A;
+    font-family: 'Arial', sans-serif;
+  }
 
-      <div style="padding: 16px; text-align: center; border-top: 2px dashed #eee;">
-        <button style="background: none; border: none; color: #999; cursor: pointer; font-size: 14px; font-weight: 600; text-transform: uppercase;">⊕ Insert new task block</button>
-      </div>
-    </div>
+  .schedule-date {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #1C1C1C;
+    line-height: 1.1;
+    margin: 0.25rem 0 2rem 0;
+  }
 
-    <!-- Notes Section -->
-    <% if @schedule.notes.present? %>
-      <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-        <h2 style="font-size: 14px; font-weight: 600; color: #2d2d2d; margin: 0 0 12px 0; text-transform: uppercase;">📌 Notes</h2>
-        <p style="color: #2d2d2d; margin: 0; line-height: 1.6;"><%= @schedule.notes %></p>
-      </div>
-    <% end %>
+  .timeline {
+    position: relative;
+    padding-left: 1rem;
+  }
 
-    <!-- AI Logic Preferences -->
-    <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-      <h2 style="font-size: 16px; font-weight: 600; color: #2d2d2d; margin: 0 0 20px 0; text-transform: uppercase;">🧠 AI Logic Preferences</h2>
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #D9CFC2;
+  }
 
-      <div style="margin-bottom: 24px;">
-        <p style="color: #999; font-size: 11px; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600;">Schedule Density</p>
-        <div style="display: flex; gap: 8px;">
-          <button style="background: white; border: 1px solid #ddd; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">Get Advice</button>
-          <button style="background: #d97c3a; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">Balanced</button>
-          <button style="background: white; border: 1px solid #ddd; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">Packed</button>
-        </div>
-      </div>
+  .timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
 
-      <div>
-        <p style="color: #999; font-size: 11px; text-transform: uppercase; margin: 0 0 12px 0; font-weight: 600;">Smart Constraints</p>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
-          <span style="color: #2d2d2d; font-size: 14px; font-weight: 500;">Priority Breaks</span>
-          <input type="checkbox" checked style="width: 40px; height: 24px; cursor: pointer;">
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0;">
-          <span style="color: #2d2d2d; font-size: 14px; font-weight: 500;">Earlier Finish</span>
-          <input type="checkbox" style="width: 40px; height: 24px; cursor: pointer;">
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
-          <span style="color: #2d2d2d; font-size: 14px; font-weight: 500;">Admin Batching</span>
-          <input type="checkbox" checked style="width: 40px; height: 24px; cursor: pointer;">
-        </div>
-      </div>
-    </div>
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.35rem;
+    top: 0.35rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #C1713A;
+  }
 
-    <!-- Messages (Collapsed for now) -->
-    <% if @messages.any? %>
-      <div style="background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-        <h2 style="font-size: 16px; font-weight: 600; color: #2d2d2d; margin: 0 0 16px 0;">💬 Chat</h2>
-        <div style="max-height: 300px; overflow-y: auto; margin-bottom: 16px;">
-          <% @messages.each do |msg| %>
-            <div style="margin-bottom: 12px; padding: 12px; background: <%= msg.role == 'user' ? '#e3f2fd' : '#f5f5f5' %>; border-radius: 8px;">
-              <p style="font-size: 12px; font-weight: 600; color: <%= msg.role == 'user' ? '#1976d2' : '#999' %>; margin: 0 0 4px 0;"><%= msg.role == 'user' ? '👤 You' : '🤖 AI' %></p>
-              <p style="color: #2d2d2d; margin: 0; font-size: 13px;"><%= msg.content %></p>
-            </div>
-          <% end %>
-        </div>
-        <%= form_with model: [@schedule, @message], local: true do |f| %>
-          <div style="display: flex; gap: 8px;">
-            <%= f.text_field :content, placeholder: "Ask AI...", style: "flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" %>
-            <%= f.submit "Send", style: "background: #d97c3a; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;" %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+  .task-time {
+    font-size: 0.75rem;
+    color: #9C8C7A;
+    font-family: 'Arial', sans-serif;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.05em;
+  }
 
-    <!-- Action Buttons -->
-    <div style="display: flex; gap: 12px; margin-top: 32px;">
-      <%= link_to "DISCARD CHANGES", schedules_path, style: "flex: 1; background: white; color: #2d2d2d; padding: 14px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: 600; border: 1px solid #ddd;" %>
-      <%= link_to "SAVE CHANGES", edit_schedule_path(@schedule), style: "flex: 1; background: #d97c3a; color: white; padding: 14px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: 600;" %>
-    </div>
+  .task-card {
+    background-color: #FFFFFF;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    border: none;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .task-card h5 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1C1C1C;
+    margin-bottom: 0.25rem;
+  }
+
+  .task-card p {
+    font-size: 0.85rem;
+    color: #7A6E63;
+    margin-bottom: 0;
+  }
+
+  .badge-fixed {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background-color: #C1713A;
+    color: white;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .badge-preferred {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background-color: #E8DDD0;
+    color: #C1713A;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .task-actions a {
+    font-size: 0.75rem;
+    color: #9C8C7A;
+    text-decoration: none;
+    margin-left: 0.75rem;
+  }
+
+  .task-actions a:hover {
+    color: #C1713A;
+  }
+
+  .btn-add-task {
+    background-color: #C1713A;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.85rem;
+    font-family: 'Arial', sans-serif;
+    text-decoration: none;
+  }
+
+  .btn-add-task:hover {
+    background-color: #A85E2E;
+    color: white;
+  }
+
+  .btn-back {
+    font-size: 0.8rem;
+    color: #9C8C7A;
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+  }
+
+  .btn-back:hover {
+    color: #C1713A;
+  }
+
+  .empty-state {
+    font-size: 0.9rem;
+    color: #9C8C7A;
+    font-family: 'Arial', sans-serif;
+    padding: 1rem 0;
+  }
+</style>
+
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-1">
+    <span class="label-small">Daily Schedule</span>
+    <%= link_to "+ Add Task", new_schedule_task_path(@schedule), class: "btn-add-task" %>
   </div>
+
+  <!-- Date -->
+  <h1 class="schedule-date"><%= @schedule.date.strftime("%A, %b %-d") %></h1>
+
+  <!-- Task Timeline -->
+  <% if @tasks.empty? %>
+    <p class="empty-state">No tasks yet — add one above.</p>
+  <% else %>
+    <div class="timeline">
+      <% @tasks.each do |task| %>
+        <div class="timeline-item">
+
+          <!-- Time -->
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <p class="task-time mb-0">
+              <% if task.fixed_time.present? %>
+                <%= task.fixed_time.strftime("%I:%M %p") %>
+              <% elsif task.preferred_time.present? %>
+                <%= task.preferred_time.strftime("%I:%M %p") %>
+              <% else %>
+                Flexible
+              <% end %>
+              &nbsp;·&nbsp; <%= task.duration_min %> mins
+            </p>
+            <% if task.fixed_time.present? %>
+              <span class="badge-fixed">Fixed</span>
+            <% elsif task.preferred_time.present? %>
+              <span class="badge-preferred">Preferred</span>
+            <% end %>
+          </div>
+
+          <!-- Card -->
+          <div class="task-card">
+            <div class="d-flex justify-content-between align-items-start">
+              <h5><%= task.category %></h5>
+              <div class="task-actions">
+                <%= link_to "Edit", edit_schedule_task_path(@schedule, task) %>
+                <%= link_to "Delete", schedule_task_path(@schedule, task), method: :delete, data: { confirm: "Delete this task?" } %>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- Footer -->
+  <div class="mt-4">
+    <%= link_to "← Back to Schedules", schedules_path, class: "btn-back" %>
+  </div>
+
 </div>
