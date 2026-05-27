@@ -1,7 +1,7 @@
 class SchedulesController < ApplicationController
   before_action :set_schedule, only: [:show, :edit, :update]
   before_action :authenticate_user!
-  
+
   def index
     @schedules = current_user.schedules.order(date: :desc)
   end
@@ -32,11 +32,12 @@ class SchedulesController < ApplicationController
       render :edit, status: :unprocessable_entity
     end
   end
-  
+
   def show
     @tasks = @schedule.tasks.order(fixed_time: :asc)
     @messages = @schedule.messages.order(created_at: :asc)
     # @free_blocks = calculate_free_blocks(@tasks)
+    @message = Message.new
   end
 
   private
@@ -44,7 +45,7 @@ class SchedulesController < ApplicationController
   def set_schedule
     @schedule = current_user.schedules.find(params[:id])
   end
-  
+
   def schedule_params
     params.require(:schedule).permit(:date, :notes)
   end
