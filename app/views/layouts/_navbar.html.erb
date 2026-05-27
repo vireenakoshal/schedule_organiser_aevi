@@ -1,0 +1,12 @@
+<nav style="background-image: url('<%= asset_path 'logo.webp' %>'); background-size: cover; background-position: center; height: 120px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;">
+
+  <h1 style="margin: 0; color: white;">Aevi</h1>
+
+  <% if user_signed_in? %>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <%= image_tag "profile.jpg", alt: "Alex", class: "rounded-circle", style: "width: 80px; height: 80px;" %>
+      <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete }, style: "background: #d97c3a; color: white; padding: 4px 16px; border-radius: 8px; text-decoration: none;" %>
+    </div>
+  <% end %>
+
+</nav>
