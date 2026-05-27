@@ -35,7 +35,7 @@
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <%= link_to "View", schedule_path(schedule), style: "background: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
                 <%= link_to "Edit", edit_schedule_path(schedule), style: "background: #fff3e0; color: #d97c3a; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
-                <%= link_to "Delete", schedule_path(schedule), method: :delete, data: { confirm: "Sure?" }, style: "background: #ffebee; color: #c62828; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
+                <%= button_to "Delete", schedule_path(schedule), method: :delete, data: { turbo_confirm: "Sure?" }, form_class: "inline-schedule-delete-form", style: "background: #ffebee; color: #c62828; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
               </div>
             </div>
           </div>
@@ -50,3 +50,26 @@
     <% end %>
   </div>
 </div>
+
+<style>
+  .inline-schedule-delete-form {
+    display: inline;
+  }
+
+  .inline-schedule-delete-form button {
+    background: #ffebee !important;
+    color: #c62828 !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    font-family: inherit !important;
+  }
+
+  .inline-schedule-delete-form button:hover {
+    opacity: 0.8;
+  }
+</style>
