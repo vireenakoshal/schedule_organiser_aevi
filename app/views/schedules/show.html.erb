@@ -1,212 +1,396 @@
+<% # app/views/schedules/show.html.erb %>
+
+<div class="schedule-container">
+  <!-- Header -->
+  <div class="schedule-header">
+    <div>
+      <p class="schedule-label">DAILY SCHEDULE</p>
+      <h1 class="schedule-title"><%= @schedule.name.presence || @schedule.date.strftime('%A') %></h1>
+      <p style="color: #999; font-size: 14px; margin: 4px 0 0 0;"><%= @schedule.date.strftime('%A, %B %d') %></p>
+    </div>
+
+    <div class="header-buttons">
+      <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#optimizeModal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v20M2 12h20"></path>
+        </svg>
+        Optimize My Schedule
+      </button>
+      <button class="btn-add-task" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+        + Add Task
+      </button>
+    </div>
+  </div>
+
+  <!-- Tasks Timeline -->
+  <div class="tasks-timeline">
+    <% if @schedule.tasks.empty? %>
+      <div class="empty-state">
+        <p>No tasks yet. Add one to get started!</p>
+      </div>
+    <% else %>
+      <div class="timeline-line"></div>
+
+      <% @schedule.tasks.each do |task| %>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+
+          <div class="task-card">
+            <div class="task-meta">
+              <span class="task-time"><%= task.display_time.strftime('%I:%M %p') %></span>
+              <span class="task-duration"><%= task.duration_min %> mins</span>
+              <span class="task-badge <%= task.time_type %>"><%= task.time_badge %></span>
+            </div>
+
+            <h3 class="task-title"><%= task.title %></h3>
+
+            <div class="task-actions">
+              <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                 data-task-id="<%= task.id %>" data-task-title="<%= task.title %>"
+                 data-task-time="<%= task.display_time %>" data-task-duration="<%= task.duration_min %>"
+                 data-task-type="<%= task.time_type %>" onclick="populateEditModal(event)">Edit</a>
+              <%= button_to 'Delete', schedule_task_path(@schedule, task), method: :delete, data: { turbo_confirm: 'Remove task?' }, class: 'action-link delete', form_class: 'inline-delete-form' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Back Link -->
+  <div class="footer-actions">
+    <%= link_to '← Back to Schedules', schedules_path, class: 'back-link' %>
+  </div>
+</div>
+
+<!-- Include the Add Task Modal -->
+<%= render 'add_task_modal', schedule: @schedule %>
+
+<!-- Include the Edit Task Modal -->
+<%= render 'edit_task_modal', schedule: @schedule %>
+
+<!-- Include the Optimize Schedule Modal (placeholder for now) -->
+<div class="modal fade" id="optimizeModal" tabindex="-1" aria-labelledby="optimizeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="optimizeModalLabel">Optimize My Schedule</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>This feature will use AI to optimize your schedule. Coming soon!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
   body {
-    background-color: #F5F0E8;
+    background: #f5f0e8;
     font-family: 'Georgia', serif;
+    color: #2d2d2d;
   }
 
-  .page-wrapper {
-    max-width: 480px;
+  .schedule-container {
+    max-width: 900px;
     margin: 0 auto;
-    padding: 2rem 1.5rem;
+    padding: 40px 24px;
   }
 
-  .label-small {
-    font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #C1713A;
-    font-family: 'Arial', sans-serif;
+  /* Header */
+  .schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
   }
 
-  .schedule-date {
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: #1C1C1C;
-    line-height: 1.1;
-    margin: 0.25rem 0 2rem 0;
-  }
-
-  .timeline {
-    position: relative;
-    padding-left: 1rem;
-  }
-
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background-color: #D9CFC2;
-  }
-
-  .timeline-item {
-    position: relative;
-    margin-bottom: 1.5rem;
-  }
-
-  .timeline-item::before {
-    content: '';
-    position: absolute;
-    left: -1.35rem;
-    top: 0.35rem;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #C1713A;
-  }
-
-  .task-time {
-    font-size: 0.75rem;
-    color: #9C8C7A;
-    font-family: 'Arial', sans-serif;
-    margin-bottom: 0.4rem;
-    letter-spacing: 0.05em;
-  }
-
-  .task-card {
-    background-color: #FFFFFF;
-    border-radius: 12px;
-    padding: 1rem 1.2rem;
-    border: none;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-
-  .task-card h5 {
-    font-size: 1.05rem;
+  .schedule-label {
+    font-size: 12px;
     font-weight: 600;
-    color: #1C1C1C;
-    margin-bottom: 0.25rem;
-  }
-
-  .task-card p {
-    font-size: 0.85rem;
-    color: #7A6E63;
-    margin-bottom: 0;
-  }
-
-  .badge-fixed {
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 1px;
+    color: #d97c3a;
+    margin-bottom: 8px;
     text-transform: uppercase;
-    background-color: #C1713A;
-    color: white;
-    padding: 0.25rem 0.6rem;
-    border-radius: 20px;
-    font-family: 'Arial', sans-serif;
   }
 
-  .badge-preferred {
-    font-size: 0.65rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background-color: #E8DDD0;
-    color: #C1713A;
-    padding: 0.25rem 0.6rem;
-    border-radius: 20px;
-    font-family: 'Arial', sans-serif;
+  .schedule-title {
+    font-size: 42px;
+    font-weight: 700;
+    color: #2d2d2d;
+    line-height: 1.2;
   }
 
-  .task-actions a {
-    font-size: 0.75rem;
-    color: #9C8C7A;
-    text-decoration: none;
-    margin-left: 0.75rem;
+  .header-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
-  .task-actions a:hover {
-    color: #C1713A;
+  .btn-optimize,
+  .btn-add-task {
+    padding: 12px 20px;
+    border: 2px solid #d97c3a;
+    background: white;
+    color: #d97c3a;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+  }
+
+  .btn-optimize:hover {
+    background: #f5f1ed;
   }
 
   .btn-add-task {
-    background-color: #C1713A;
+    background: #d97c3a;
     color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.5rem 1.2rem;
-    font-size: 0.85rem;
-    font-family: 'Arial', sans-serif;
-    text-decoration: none;
+    border-color: #d97c3a;
   }
 
   .btn-add-task:hover {
-    background-color: #A85E2E;
+    background: #c26b2e;
+    border-color: #c26b2e;
+  }
+
+  /* Timeline */
+  .tasks-timeline {
+    position: relative;
+    margin-bottom: 40px;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 23px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e0d5c8;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .timeline-dot {
+    width: 48px;
+    height: 48px;
+    background: #d97c3a;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: 4px;
+  }
+
+  .task-card {
+    flex: 1;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .task-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .task-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .task-time {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d2d2d;
+  }
+
+  .task-duration {
+    font-size: 13px;
+    color: #666;
+  }
+
+  .task-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .task-badge.fixed_time {
+    background: #C1713A;
     color: white;
   }
 
-  .btn-back {
-    font-size: 0.8rem;
-    color: #9C8C7A;
-    text-decoration: none;
-    font-family: 'Arial', sans-serif;
+  .task-badge.preferred_time {
+    background: #E8DDD0;
+    color: #2d2d2d;
   }
 
-  .btn-back:hover {
-    color: #C1713A;
+  .task-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2d2d2d;
+    margin-bottom: 12px;
+  }
+
+  .task-actions {
+    display: flex;
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  .action-link {
+    color: #d97c3a;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+
+  .action-link:hover {
+    color: #c26b2e;
+  }
+
+  .action-link.delete {
+    color: #e74c3c;
+  }
+
+  .action-link.delete:hover {
+    color: #c0392b;
+  }
+
+  .inline-delete-form {
+    display: inline;
+  }
+
+  .inline-delete-form button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
   }
 
   .empty-state {
-    font-size: 0.9rem;
-    color: #9C8C7A;
-    font-family: 'Arial', sans-serif;
-    padding: 1rem 0;
+    text-align: center;
+    padding: 60px 24px;
+    color: #999;
+    font-size: 16px;
+  }
+
+  /* Footer */
+  .footer-actions {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid #e0d5c8;
+  }
+
+  .back-link {
+    color: #d97c3a;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover {
+    color: #c26b2e;
+  }
+
+  /* Modal Overrides */
+  .modal-content {
+    background: #f9f9f9;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+  }
+
+  .modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d2d2d;
+  }
+
+  .modal-body {
+    padding: 24px;
+  }
+
+  .modal-footer {
+    border-top: 1px solid #e0e0e0;
+    background: white;
   }
 </style>
 
-<div class="page-wrapper">
+<script>
+  function populateEditModal(event) {
+    event.preventDefault();
 
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-1">
-    <span class="label-small">Daily Schedule</span>
-    <%= link_to "+ Add Task", new_schedule_task_path(@schedule), class: "btn-add-task" %>
-  </div>
+    const link = event.currentTarget;
+    const taskId = link.dataset.taskId;
+    const taskTitle = link.dataset.taskTitle;
+    const taskTime = link.dataset.taskTime;
+    const taskDuration = link.dataset.taskDuration;
+    const taskType = link.dataset.taskType;
 
-  <!-- Date -->
-  <h1 class="schedule-date"><%= @schedule.date.strftime("%A, %b %-d") %></h1>
+    // Update form action to point to the correct update route
+    const form = document.getElementById('editTaskForm');
+    form.action = `/schedules/<%= @schedule.id %>/tasks/${taskId}`;
+    form.method = 'POST';
 
-  <!-- Task Timeline -->
-  <% if @tasks.empty? %>
-    <p class="empty-state">No tasks yet — add one above.</p>
-  <% else %>
-    <div class="timeline">
-      <% @tasks.each do |task| %>
-        <div class="timeline-item">
+    // Add hidden method override for PUT/PATCH
+    let methodInput = form.querySelector('input[name="_method"]');
+    if (!methodInput) {
+      methodInput = document.createElement('input');
+      methodInput.type = 'hidden';
+      methodInput.name = '_method';
+      methodInput.value = 'PATCH';
+      form.appendChild(methodInput);
+    }
 
-          <!-- Time -->
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <p class="task-time mb-0">
-              <% if task.fixed_time.present? %>
-                <%= task.fixed_time.strftime("%I:%M %p") %>
-              <% elsif task.preferred_time.present? %>
-                <%= task.preferred_time.strftime("%I:%M %p") %>
-              <% else %>
-                Flexible
-              <% end %>
-              &nbsp;·&nbsp; <%= task.duration_min %> mins
-            </p>
-            <% if task.fixed_time.present? %>
-              <span class="badge-fixed">Fixed</span>
-            <% elsif task.preferred_time.present? %>
-              <span class="badge-preferred">Preferred</span>
-            <% end %>
-          </div>
+    // Populate fields
+    document.querySelector('#editTaskForm #task_title').value = taskTitle;
+    document.querySelector('#editTaskForm #task_duration_min').value = taskDuration;
 
-          <!-- Card -->
-          <div class="task-card">
-            <div class="d-flex justify-content-between align-items-start">
-              <h5><%= task.category %></h5>
-              <div class="task-actions">
-                <%= link_to "Edit", edit_schedule_task_path(@schedule, task) %>
-                <%= link_to "Delete", schedule_task_path(@schedule, task), method: :delete, data: { confirm: "Delete this task?" } %>
-              </div>
-            </div>
-          </div>
+    // Set time type radio button
+    if (taskType === 'fixed_time') {
+      document.querySelector('#edit_fixed_time').checked = true;
+    } else {
+      document.querySelector('#edit_preferred_time').checked = true;
+    }
+  }
 
-        </div>
-      <% end %>
-    </div>
-  <% end %>
+  function initializeTimeFieldToggle() {
+    console.log('Initializing time field toggle...');
 
  <!-- Button trigger modal -->
   <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -271,4 +455,49 @@
     const messages = document.getElementById("messages");
     if (messages) messages.scrollTop = messages.scrollHeight;
   });
+    const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
+    console.log('Found radios:', timeTypeRadios.length);
+
+    const fixedField = document.getElementById('fixedTimeField');
+    const preferredField = document.getElementById('preferredTimeField');
+
+    console.log('fixedField found:', !!fixedField);
+    console.log('preferredField found:', !!preferredField);
+
+    if (!fixedField || !preferredField || timeTypeRadios.length === 0) {
+      console.log('Elements not found, retrying...');
+      return;
+    }
+
+    function updateTimeFields() {
+      const selectedValue = Array.from(timeTypeRadios).find(r => r.checked)?.value;
+      console.log('Selected value:', selectedValue);
+
+      if (selectedValue === 'fixed_time') {
+        fixedField.style.display = 'block';
+        preferredField.style.display = 'none';
+        console.log('Showing fixed time field');
+      } else if (selectedValue === 'preferred_time') {
+        fixedField.style.display = 'none';
+        preferredField.style.display = 'block';
+        console.log('Showing preferred time field');
+      } else {
+        fixedField.style.display = 'none';
+        preferredField.style.display = 'none';
+        console.log('Hiding both fields');
+      }
+    }
+
+    timeTypeRadios.forEach(radio => {
+      radio.addEventListener('change', updateTimeFields);
+    });
+
+    updateTimeFields();
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeTimeFieldToggle);
+  document.addEventListener('turbo:load', initializeTimeFieldToggle);
+  document.addEventListener('shown.bs.modal', initializeTimeFieldToggle);
+
+  setTimeout(initializeTimeFieldToggle, 500);
 </script>

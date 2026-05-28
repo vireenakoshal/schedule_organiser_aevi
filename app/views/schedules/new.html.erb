@@ -1,53 +1,34 @@
-<div style="background: #f5f1ed; min-height: 100vh; padding: 40px 20px;">
+<div style="background: #f5f0e8; min-height: 100vh; padding: 40px 20px;">
   <div style="max-width: 600px; margin: 0 auto;">
-    <!-- Header -->
-    <div style="margin-bottom: 40px;">
-      <%= link_to "← Back", schedules_path, style: "color: #d97c3a; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 24px;" %>
-      <h1 style="font-size: 32px; font-weight: 700; color: #2d2d2d; margin: 0;">
-        <%= @schedule.persisted? ? "✏️ Edit Schedule" : "➕ New Schedule" %>
-      </h1>
-    </div>
+    <h1 style="font-size: 32px; font-weight: 700; color: #2d2d2d; margin-bottom: 30px;">Create New Schedule</h1>
 
-    <!-- Error Messages -->
-    <% if @schedule.errors.any? %>
-      <div style="background: #ffebee; border-left: 4px solid #c62828; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-        <h4 style="color: #c62828; margin: 0 0 12px 0; font-size: 14px;">⚠️ <%= @schedule.errors.count %> error<%= @schedule.errors.count != 1 ? 's' : '' %></h4>
-        <ul style="margin: 0; padding-left: 20px;">
-          <% @schedule.errors.full_messages.each do |msg| %>
-            <li style="color: #c62828; font-size: 13px; margin-bottom: 4px;"><%= msg %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <!-- Form -->
-    <div style="background: white; border-radius: 12px; padding: 32px;">
-      <%= form_with model: @schedule, local: true do |f| %>
-        <!-- Date Field -->
-        <div style="margin-bottom: 24px;">
-          <%= f.label :date, "Select Date", style: "display: block; font-weight: 600; color: #2d2d2d; margin-bottom: 8px; font-size: 14px;" %>
-          <%= f.date_field :date, style: "width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box;", required: true %>
-        </div>
-
-        <!-- Notes Field -->
-        <div style="margin-bottom: 32px;">
-          <%= f.label :notes, "Notes (Optional)", style: "display: block; font-weight: 600; color: #2d2d2d; margin-bottom: 8px; font-size: 14px;" %>
-          <%= f.text_area :notes, style: "width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; font-family: inherit;", rows: 5, placeholder: "Add any notes for this day..." %>
-        </div>
-
-        <!-- Buttons -->
-        <div style="display: flex; gap: 12px;">
-          <%= f.submit "Save Schedule", style: "flex: 1; background: #d97c3a; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;" %>
-          <%= link_to "Cancel", schedules_path, style: "flex: 1; background: white; color: #2d2d2d; padding: 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; text-align: center;" %>
+    <%= form_with model: @schedule, local: true do |f| %>
+      <% if @schedule.errors.any? %>
+        <div style="background: #ffebee; color: #c62828; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+          <h3 style="margin: 0 0 8px 0;"><%= pluralize(@schedule.errors.count, "error") %> prevented this schedule from being saved:</h3>
+          <ul style="margin: 0; padding-left: 20px;">
+            <% @schedule.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
         </div>
       <% end %>
-    </div>
 
-    <!-- Info Text -->
-    <% if @schedule.persisted? %>
-      <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
-        Created <%= time_ago_in_words(@schedule.created_at) %> ago
-      </p>
+      <div style="margin-bottom: 24px;">
+        <%= f.label :name, "Schedule Name (Optional)", style: "display: block; font-weight: 600; color: #2d2d2d; margin-bottom: 8px;" %>
+        <%= f.text_field :name, placeholder: "e.g., Work Day, Study Session", style: "width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px;" %>
+        <p style="color: #999; font-size: 12px; margin: 4px 0 0 0;">Give your schedule a custom name. If left blank, the day of the week will be used.</p>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <%= f.label :date, "Date", style: "display: block; font-weight: 600; color: #2d2d2d; margin-bottom: 8px;" %>
+        <%= f.date_field :date, style: "width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px;" %>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <%= f.submit "Create Schedule", style: "background: #d97c3a; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px;" %>
+        <%= link_to "Cancel", schedules_path, style: "background: white; color: #d97c3a; padding: 12px 24px; border: 2px solid #d97c3a; border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 14px;" %>
+      </div>
     <% end %>
   </div>
 </div>

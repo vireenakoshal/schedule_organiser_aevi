@@ -1,0 +1,111 @@
+x<div class="task-form-container">
+  <%= form_with model: [@schedule, @task], local: true do |f| %>
+    <% if @task.errors.any? %>
+      <div class="error-messages">
+        <h3><%= pluralize(@task.errors.count, "error") %> prevented this task from being saved:</h3>
+        <ul>
+          <% @task.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= f.label :category, "Task Title" %>
+      <%= f.text_field :category, placeholder: "e.g., Project Strategy Review", class: "form-input" %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :duration_min, "Duration (minutes)" %>
+      <%= f.number_field :duration_min, placeholder: "60", class: "form-input" %>
+    </div>
+
+    <div class="time-type-section">
+      <p class="time-type-label">Time Type</p>
+
+      <div class="time-option">
+        <%= f.label :fixed_time, "Fixed Time" %>
+        <%= f.time_field :fixed_time, class: "form-input" %>
+      </div>
+
+      <div class="time-option">
+        <%= f.label :preferred_time, "Preferred Time (Flexible)" %>
+        <%= f.time_field :preferred_time, class: "form-input" %>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit @task.persisted? ? "Update Task" : "Add Task", class: "btn-primary" %>
+      <%= link_to "Cancel", @schedule, class: "btn-secondary" %>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .task-form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #f5f1ed;
+    border-radius: 12px;
+  }
+
+  .error-messages {
+    background: #ffebee;
+    border: 1px solid #ef5350;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    color: #c62828;
+  }
+
+  .error-messages h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .error-messages ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .error-messages li {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d2d2d;
+    margin-bottom: 8px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #d97c3a;
+    box-shadow: 0 0 0 3px rgba(217, 124, 58, 0.1);
+  }
+
+  .time-type-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
