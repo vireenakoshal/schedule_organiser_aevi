@@ -36,6 +36,7 @@ class SchedulesController < ApplicationController
   def show
     @tasks = @schedule.tasks.order(fixed_time: :asc)
     @messages = @schedule.messages.order(created_at: :asc)
+    @message = Message.new
   end
 
   def destroy

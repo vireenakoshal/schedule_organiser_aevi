@@ -392,6 +392,69 @@
   function initializeTimeFieldToggle() {
     console.log('Initializing time field toggle...');
 
+ <!-- Button trigger modal -->
+  <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    CHAT TO AEVI - OPTIMISE YOUR DAY
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Lets optimise your day together! chat with Aevi for inspiration</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <% user_message_count = @schedule.messages.where(role: "user").count %>
+
+          <% if user_message_count >= 20 %>
+            <div style="
+              background-color: #FFF3CD;
+              border: 1px solid #C1713A;
+              border-radius: 8px;
+              padding: 0.75rem 1rem;
+              margin-bottom: 1rem;
+              font-size: 0.85rem;
+              color: #7A6E63;
+              font-family: 'Arial', sans-serif;">
+              You've reached the 20 message limit for this schedule. Start a new schedule to keep chatting with Aevi.
+            </div>
+          <% end %>
+
+          <div id="messages" style="max-height: 350px; overflow-y: auto; margin-bottom: 1rem;">
+            <%= render @schedule.messages %>
+          </div>
+
+          <% unless user_message_count >= 10 %>
+          <div id="message_form">
+            <%= render "messages/form", schedule: @schedule, message: @message %>
+          </div>
+          <% end %>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="mt-4">
+    <%= link_to "← Back to Schedules", schedules_path, class: "btn-back" %>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener("turbo:after-stream-render", () => {
+    const messages = document.getElementById("messages");
+    if (messages) messages.scrollTop = messages.scrollHeight;
+  });
     const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
     console.log('Found radios:', timeTypeRadios.length);
 
