@@ -40,6 +40,23 @@ class TasksController < ApplicationController
   end
 
   def task_params
-    params.require(:task).permit(:title, :duration_min, :fixed_time, :preferred_time)
+    permitted_params = params.require(:task).permit(:title, :duration_min, :time_type, :display_time)
+
+    # Map time_type and display_time to fixed_time or preferred_time
+    if permitted_params[:time_type].present? && permitted_params[:display_time].present?
+      if permitted_params[:time_type] == 'fixed_time'
+        permitted_params[:fixed_time] = permitted_params[:display_time]
+        permitted_params[:preferred_time] = nil
+      elsif permitted_params[:time_type] == 'preferred_time'
+        permitted_params[:preferred_time] = permitted_params[:display_time]
+        permitted_params[:fixed_time] = nil
+      end
+    end
+
+    # Remove the form field names since we've mapped them
+    permitted_params.delete(:time_type)
+    permitted_params.delete(:display_time)
+
+    permitted_params
   end
 end

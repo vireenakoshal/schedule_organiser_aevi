@@ -15,8 +15,21 @@
         <% @schedules.each do |schedule| %>
           <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #d97c3a;">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
-              <h3 style="font-size: 18px; font-weight: 600; color: #2d2d2d; margin: 0;"><%= schedule.date.strftime("%A") %></h3>
-              <span style="background: #fff3e0; color: #d97c3a; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+              <div>
+                <h3 style="font-size: 20px; font-weight: 700; color: #2d2d2d; margin: 0 0 4px 0;">
+                  <%= schedule.name.presence || schedule.date.strftime("%A") %>
+                </h3>
+                <% if schedule.name.present? %>
+                  <p style="color: #999; font-size: 13px; margin: 0;">
+                    <%= schedule.date.strftime("%A, %B %d") %>
+                  </p>
+                <% else %>
+                  <p style="color: #999; font-size: 13px; margin: 0;">
+                    <%= schedule.date.strftime("%B %d") %>
+                  </p>
+                <% end %>
+              </div>
+              <span style="background: #fff3e0; color: #d97c3a; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">
                 <%= schedule.date.strftime("%b %d") %>
               </span>
             </div>

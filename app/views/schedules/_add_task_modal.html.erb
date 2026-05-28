@@ -2,7 +2,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
@@ -14,6 +14,20 @@
           <div class="mb-3">
             <%= f.label :title, "Task Title", class: "form-label" %>
             <%= f.text_field :title, placeholder: "e.g., Project Strategy Review", class: "form-control" %>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Date & Time</label>
+            <div class="date-time-row">
+              <div class="date-col">
+                <%= f.label :display_time, "Date", class: "form-label-small" %>
+                <%= f.date_field :display_time, class: "form-control" %>
+              </div>
+              <div class="time-col">
+                <%= f.label :display_time, "Time", class: "form-label-small" %>
+                <%= f.time_field :display_time, class: "form-control" %>
+              </div>
+            </div>
           </div>
 
           <div class="mb-3">
@@ -33,16 +47,6 @@
                 <%= f.label :time_type_preferred_time, 'Preferred Time (Flexible)', class: 'form-check-label' %>
               </div>
             </div>
-          </div>
-
-          <div class="mb-3" id="fixedTimeField" style="display: none;">
-            <%= f.label :fixed_time, "Fixed Time", class: "form-label" %>
-            <%= f.time_field :fixed_time, class: "form-control" %>
-          </div>
-
-          <div class="mb-3" id="preferredTimeField" style="display: none;">
-            <%= f.label :preferred_time, "Preferred Time", class: "form-label" %>
-            <%= f.time_field :preferred_time, class: "form-control" %>
           </div>
 
           <div class="modal-footer">
@@ -81,6 +85,15 @@
     font-weight: 500;
     color: #2d2d2d;
     margin-bottom: 8px;
+    display: block;
+  }
+
+  .form-label-small {
+    font-weight: 500;
+    color: #2d2d2d;
+    margin-bottom: 6px;
+    font-size: 13px;
+    display: block;
   }
 
   .form-control {
@@ -88,12 +101,25 @@
     border-radius: 6px;
     padding: 10px;
     font-size: 14px;
+    width: 100%;
   }
 
   .form-control:focus {
     border-color: #d97c3a;
     box-shadow: 0 0 0 2px rgba(217, 124, 58, 0.1);
     outline: none;
+  }
+
+  .date-time-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .date-col,
+  .time-col {
+    display: flex;
+    flex-direction: column;
   }
 
   .form-check {
@@ -103,6 +129,7 @@
   .form-check-input {
     margin-right: 8px;
     cursor: pointer;
+    accent-color: #d97c3a;
   }
 
   .form-check-label {
@@ -113,57 +140,44 @@
   .modal-footer {
     border-top: 1px solid #e0e0e0;
     background: white;
+    padding: 16px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: all 0.2s;
   }
 
   .btn-primary {
     background: #d97c3a;
-    border-color: #d97c3a;
     color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 600;
   }
 
   .btn-primary:hover {
     background: #c26b2e;
-    border-color: #c26b2e;
   }
 
   .btn-secondary {
     background: white;
-    border-color: #e0e0e0;
     color: #2d2d2d;
+    border: 1px solid #ddd;
   }
 
   .btn-secondary:hover {
     background: #f9f9f9;
-    border-color: #d0d0d0;
+    border-color: #ccc;
+  }
+
+  .mb-3 {
+    margin-bottom: 20px;
   }
 </style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
-
-    function updateTimeFields() {
-      const fixedField = document.getElementById('fixedTimeField');
-      const preferredField = document.getElementById('preferredTimeField');
-
-      const selectedValue = document.querySelector('input[name="task[time_type]"]:checked')?.value;
-
-      if (selectedValue === 'fixed_time') {
-        fixedField.style.display = 'block';
-        preferredField.style.display = 'none';
-      } else if (selectedValue === 'preferred_time') {
-        fixedField.style.display = 'none';
-        preferredField.style.display = 'block';
-      }
-    }
-
-    timeTypeRadios.forEach(radio => {
-      radio.addEventListener('change', updateTimeFields);
-    });
-
-    updateTimeFields();
-  });
-</script>
