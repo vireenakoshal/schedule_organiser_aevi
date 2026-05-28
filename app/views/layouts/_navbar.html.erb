@@ -1,46 +1,37 @@
-<nav style="background: white; border-bottom: 1px solid #e0d5c8; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+<nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #F5F1ED 0%, #FFF9F5 100%); border-bottom: 2px solid #D97E3B;">
+  <div class="container-fluid px-4">
+    <!-- Logo and Title -->
+    <a class="navbar-brand d-flex align-items-center gap-2" href="<%= schedules_path %>">
+      <div style="width: 40px; height: 40px; background-color: #D97E3B; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;">
+          <path d="M8 4h16a2 2 0 012 2v10h-2V6H8v20h6v2H8a2 2 0 01-2-2V6a2 2 0 012-2zm8 8h6v2h-6v-2zm0 4h6v2h-6v-2z" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div style="font-weight: 700; color: #333; font-size: 18px;">Aevi</div>
+        <div style="font-size: 12px; color: #999;">Schedule Organiser</div>
+      </div>
+    </a>
 
-  <!-- Left side: Logo and Brand -->
-  <div style="display: flex; align-items: center; gap: 16px;">
-    <!-- Your Aevi Logo -->
-    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #d97c3a 0%, #c26b2e 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M9 13c0-1.657 1-3 3-3s3 1.343 3 3v3a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-3Zm4.5 0v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-3c0-.535.16-.895.353-1.105.175-.19.502-.395 1.147-.395s.972.205 1.147.395c.193.21.353.57.353 1.105Z" fill="white"></path>
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M3 12.245a5 5 0 0 1 1.678-3.737l4.665-4.146a4 4 0 0 1 5.315 0l4.664 4.146A5 5 0 0 1 21 12.245V17a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-4.755Zm16.5 0V17a2.5 2.5 0 0 1-2.5 2.5H7A2.5 2.5 0 0 1 4.5 17v-4.755A3.5 3.5 0 0 1 5.675 9.63l4.664-4.146a2.5 2.5 0 0 1 3.322 0l4.664 4.146a3.5 3.5 0 0 1 1.175 2.616Z" fill="white"></path>
-      </svg>
-    </div>
+    <!-- Hamburger Menu Button (shows on mobile) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <div>
-      <h1 style="margin: 0; color: #2d2d2d; font-size: 24px; font-weight: 700; font-family: 'Georgia', serif;">Aevi</h1>
-      <p style="margin: 2px 0 0 0; color: #999; font-size: 12px;">Schedule Organiser</p>
+    <!-- Navbar Content (collapses on mobile) -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <div class="ms-auto d-flex align-items-center gap-3 flex-column flex-lg-row">
+        <!-- User Avatar and Email -->
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle" style="width: 36px; height: 36px; background-color: #D97E3B; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+            <%= current_user.email.first.upcase %>
+          </div>
+          <span class="d-none d-md-inline" style="color: #333; font-size: 14px;"><%= current_user.email %></span>
+        </div>
+
+        <!-- Logout Button -->
+        <%= link_to "Log out", destroy_user_session_path, method: :delete, class: "btn", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 8px 20px; border-radius: 6px;" %>
+      </div>
     </div>
   </div>
-
-  <!-- Right side: User Menu -->
-  <% if user_signed_in? %>
-    <div style="display: flex; align-items: center; gap: 16px;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <!-- User Avatar -->
-        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #d97c3a 0%, #c26b2e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px;">
-          <%= current_user.email.first.upcase %>
-        </div>
-
-        <!-- Email -->
-        <div style="text-align: right;">
-          <p style="margin: 0; color: #2d2d2d; font-weight: 600; font-size: 14px;">
-            <%= current_user.email %>
-          </p>
-        </div>
-      </div>
-
-      <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete }, style: "background: #d97c3a; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s; border: none; cursor: pointer;" %>
-    </div>
-  <% end %>
-
 </nav>
-
-<style>
-  nav a:hover {
-    background: #c26b2e !important;
-  }
-</style>

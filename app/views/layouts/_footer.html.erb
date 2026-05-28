@@ -1,44 +1,16 @@
-<footer style="
-  background: linear-gradient(135deg, #F5F1ED 0%, #FFF9F5 100%);
-  border-top: 2px solid #D97E3B;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  gap: 20px;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-">
-  <%= link_to schedules_path, style: "
-    flex: 1;
-    text-decoration: none;
-    padding: 12px;
-    text-align: center;
-    border-radius: 8px;
-    background-color: #D97E3B;
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-  " do %>
-    📊 Dashboard
-  <% end %>
-
-  <%= link_to new_schedule_path, style: "
-    flex: 1;
-    text-decoration: none;
-    padding: 12px;
-    text-align: center;
-    border-radius: 8px;
-    background-color: #D97E3B;
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-  " do %>
-    📅 Add Schedule
-  <% end %>
-</footer>
+<footer class="mt-5" style="background: linear-gradient(135deg, #F5F1ED 0%, #FFF9F5 100%); border-top: 2px solid #D97E3B; padding: 16px 20px;">
+  <div class="container-fluid">
+    <div class="row g-2">
+      <div class="col-6 col-md-6">
+        <%= link_to schedules_path, class: "btn w-100", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 12px;" do %>
+          📊 Dashboard
+        <% end %>
+      </div>
+      <div class="col-6 col-md-6">
+        <%= link_to new_schedule_path, class: "btn w-100", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 12px;" do %>
+          📅 Add Schedule
+        <% end %>
+      </div>
+    </div>
+  </div>
+</footer> 
