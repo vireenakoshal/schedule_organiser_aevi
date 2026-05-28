@@ -1,0 +1,90 @@
+<div style="
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F5F1ED 0%, #FFF9F5 100%);
+  padding: 40px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+">
+  <div style="
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  ">
+    <h2 style="
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    ">Log in</h2>
+
+    <p style="
+      text-align: center;
+      color: #999;
+      margin-bottom: 30px;
+      font-size: 14px;
+    ">Schedule Organiser</p>
+
+    <%= form_for(resource, as: resource_name, local: true, url: session_path(resource_name)) do |form| %>
+      <div style="margin-bottom: 20px;">
+        <%= form.label :email, style: "display: block; margin-bottom: 8px; font-weight: 600; color: #333;" %>
+        <%= form.email_field :email, autofocus: true, autocomplete: "email", style: "
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #E0D5CC;
+          border-radius: 6px;
+          font-size: 14px;
+          box-sizing: border-box;
+        " %>
+      </div>
+
+      <div style="margin-bottom: 25px;">
+        <%= form.label :password, style: "display: block; margin-bottom: 8px; font-weight: 600; color: #333;" %>
+        <%= form.password_field :password, autocomplete: "current-password", style: "
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #E0D5CC;
+          border-radius: 6px;
+          font-size: 14px;
+          box-sizing: border-box;
+        " %>
+      </div>
+
+      <% if devise_mapping.rememberable? %>
+        <div style="margin-bottom: 25px;">
+          <%= form.check_box :remember_me, style: "margin-right: 8px;" %>
+          <%= form.label :remember_me, "Remember me", style: "color: #666; font-size: 14px;" %>
+        </div>
+      <% end %>
+
+      <%= form.submit "Log in", style: "
+        width: 100%;
+        padding: 12px;
+        background-color: #D97E3B;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      " %>
+    <% end %>
+
+    <div style="margin-top: 30px; text-align: center;">
+      <% if devise_mapping.registerable? %>
+        <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+          Don't have an account?
+          <%= link_to "Sign up", new_registration_path(resource_name), style: "color: #D97E3B; text-decoration: none; font-weight: 600;" %>
+        </p>
+      <% end %>
+
+      <% if devise_mapping.recoverable? %>
+        <%= link_to "Forgot your password?", new_password_path(resource_name), style: "color: #D97E3B; text-decoration: none; font-size: 14px;" %>
+      <% end %>
+    </div>
+  </div>
+</div>

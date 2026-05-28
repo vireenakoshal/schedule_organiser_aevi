@@ -1,12 +1,46 @@
-<nav style="background-image: url('<%= asset_path 'logo.webp' %>'); background-size: cover; background-position: center; height: 120px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px;">
+<nav style="background: white; border-bottom: 1px solid #e0d5c8; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
 
-  <h1 style="margin: 0; color: white;">Aevi</h1>
+  <!-- Left side: Logo and Brand -->
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <!-- Your Aevi Logo -->
+    <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #d97c3a 0%, #c26b2e 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M9 13c0-1.657 1-3 3-3s3 1.343 3 3v3a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-3Zm4.5 0v3a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-3c0-.535.16-.895.353-1.105.175-.19.502-.395 1.147-.395s.972.205 1.147.395c.193.21.353.57.353 1.105Z" fill="white"></path>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M3 12.245a5 5 0 0 1 1.678-3.737l4.665-4.146a4 4 0 0 1 5.315 0l4.664 4.146A5 5 0 0 1 21 12.245V17a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-4.755Zm16.5 0V17a2.5 2.5 0 0 1-2.5 2.5H7A2.5 2.5 0 0 1 4.5 17v-4.755A3.5 3.5 0 0 1 5.675 9.63l4.664-4.146a2.5 2.5 0 0 1 3.322 0l4.664 4.146a3.5 3.5 0 0 1 1.175 2.616Z" fill="white"></path>
+      </svg>
+    </div>
 
+    <div>
+      <h1 style="margin: 0; color: #2d2d2d; font-size: 24px; font-weight: 700; font-family: 'Georgia', serif;">Aevi</h1>
+      <p style="margin: 2px 0 0 0; color: #999; font-size: 12px;">Schedule Organiser</p>
+    </div>
+  </div>
+
+  <!-- Right side: User Menu -->
   <% if user_signed_in? %>
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <%= image_tag "profile.jpg", alt: "Alex", class: "rounded-circle", style: "width: 80px; height: 80px;" %>
-      <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete }, style: "background: #d97c3a; color: white; padding: 4px 16px; border-radius: 8px; text-decoration: none;" %>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <!-- User Avatar -->
+        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #d97c3a 0%, #c26b2e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px;">
+          <%= current_user.email.first.upcase %>
+        </div>
+
+        <!-- Email -->
+        <div style="text-align: right;">
+          <p style="margin: 0; color: #2d2d2d; font-weight: 600; font-size: 14px;">
+            <%= current_user.email %>
+          </p>
+        </div>
+      </div>
+
+      <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete }, style: "background: #d97c3a; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; transition: all 0.2s; border: none; cursor: pointer;" %>
     </div>
   <% end %>
 
 </nav>
+
+<style>
+  nav a:hover {
+    background: #c26b2e !important;
+  }
+</style>
