@@ -1,23 +1,16 @@
-<footer style="background-color: #FAC104f0; display: flex; justify-content: space-around; align-items: center; padding: 10px 0; position: fixed; bottom: 0; width: 100%;">
-
-  <a href="/dashboard" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white;">
-    <%= image_tag "dashboard.png", style: "width: 30px; height: 30px;" %>
-    <span>Dashboard</span>
-  </a>
-
-  <a href="/schedules" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white;">
-    <%= image_tag "schedule.png", style: "width: 30px; height: 30px;" %>
-    <span>Schedule</span>
-  </a>
-
-  <a href="/history" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white;">
-    <%= image_tag "history.png", style: "width: 30px; height: 30px;" %>
-    <span>History</span>
-  </a>
-
-  <a href="/insights" style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white;">
-    <%= image_tag "insights.png", style: "width: 30px; height: 30px;" %>
-    <span>Insights</span>
-  </a>
-
-</footer>
+<footer class="mt-5" style="background: linear-gradient(135deg, #F5F1ED 0%, #FFF9F5 100%); border-top: 2px solid #D97E3B; padding: 16px 20px;">
+  <div class="container-fluid">
+    <div class="row g-2">
+      <div class="col-6 col-md-6">
+        <%= link_to schedules_path, class: "btn w-100", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 12px;" do %>
+          📊 Dashboard
+        <% end %>
+      </div>
+      <div class="col-6 col-md-6">
+        <%= link_to new_schedule_path, class: "btn w-100", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 12px;" do %>
+          📅 Add Schedule
+        <% end %>
+      </div>
+    </div>
+  </div>
+</footer> 
