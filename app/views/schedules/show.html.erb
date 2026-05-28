@@ -56,15 +56,16 @@
       <% end %>
     <% end %>
   </div>
-<div>
-   <!-- Button trigger modal -->
-  <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    CHAT TO AEVI - OPTIMISE YOUR DAY
-  </button>
-</div>
+
+  <!-- Chat to Aevi Button -->
+  <div style="text-align: center; margin: 50px 0;">
+    <button type="button" class="btn-chat-aevi" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      💬 Chat to Aevi
+    </button>
+  </div>
+
   <!-- Back Link -->
   <div class="footer-actions">
-
     <%= link_to '← Back to Schedules', schedules_path, class: 'back-link' %>
   </div>
 </div>
@@ -173,6 +174,26 @@
   .btn-add-task:hover {
     background: #c26b2e;
     border-color: #c26b2e;
+  }
+
+  /* Chat to Aevi Button */
+  .btn-chat-aevi {
+    padding: 14px 40px;
+    background-color: #d97c3a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .btn-chat-aevi:hover {
+    background-color: #c26b2e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(217, 124, 58, 0.3);
   }
 
   /* Timeline */
@@ -401,11 +422,6 @@
 
       </div>
     </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="mt-4">
-    <%= link_to "← Back to Schedules", schedules_path, class: "btn-back" %>
   </div>
 
 </div>
