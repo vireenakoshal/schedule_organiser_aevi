@@ -1,0 +1,8 @@
+<%= turbo_stream.append "messages" do %>
+  <%= render partial: "messages/message", locals: { message: @user_message } %>
+  <%= render partial: "messages/message", locals: { message: @assistant_message } %>
+<% end %>
+
+<%= turbo_stream.replace "message_form" do %>
+  <%= render "messages/form", schedule: @schedule, message: Message.new %>
+<% end %>

@@ -1,18 +1,17 @@
 class Message < ApplicationRecord
-  belongs_to :schedule
+   belongs_to :schedule
 
-  SYSTEM_PROMPT = "you are an assistant that looks at the available time blocks and suggests what activities can be done in the designated time block. suggest activities based on what the user likes, always start with wholesome activities like walk with a friend, go for a relaxing walk by the beach etc "
+  MAX_USER_MESSAGES = 10
 
-  def create
-    @chat = current_user.chats.find(params[:chat_id])
-    @schedule = @chat.schedule
+  validates :content, presence: true
+  validates :role, presence: true
+  validate :user_message_limit, if: -> { role == "user" }
 
-    @message = Message.new(message_params)
-    @message.chat = @chat
-    @message.role = "user"
+  private
 
-  if @message.save
-    # ...
+  def user_message_limit
+    if schedule.messages.where(role: "user").count >= MAX_USER_MESSAGES
+      errors.add(:content, "You can only send #{MAX_USER_MESSAGES} messages per schedule")
+    end
   end
-end
 end
