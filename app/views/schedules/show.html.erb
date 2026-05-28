@@ -1,5 +1,8 @@
 <% # app/views/schedules/show.html.erb %>
 
+
+<%= button_to "Create task with ai ✨", create_with_ai_schedule_tasks_path(@schedule), method: :post, class: "btn-optimize" %>
+
 <div class="schedule-container">
   <!-- Header -->
   <div class="schedule-header">
@@ -9,8 +12,8 @@
       <p style="color: #999; font-size: 14px; margin: 4px 0 0 0;"><%= @schedule.date.strftime('%A, %B %d') %></p>
     </div>
 
-    <div class="header-buttons">
-      <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#optimizeModal">
+  <div class="header-buttons">
+    <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#optimizeModal">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2v20M2 12h20"></path>
         </svg>
@@ -53,6 +56,14 @@
       <% end %>
     <% end %>
   </div>
+
+  <% last_plan = @schedule.messages.where(role: "assistant").last %>
+  <% if last_plan %>
+    <div style="background: white; border-left: 4px solid #d97c3a; border-radius: 8px; padding: 24px; margin-bottom: 40px;">
+      <p style="font-size: 12px; font-weight: 600; letter-spacing: 1px; color: #d97c3a; text-transform: uppercase; margin-bottom: 12px;">AI PLAN</p>
+      <%= simple_format last_plan.content %>
+    </div>
+  <% end %>
 
   <!-- Back Link -->
   <div class="footer-actions">
