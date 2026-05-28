@@ -45,7 +45,10 @@
             <h3 class="task-title"><%= task.title %></h3>
 
             <div class="task-actions">
-              <%= link_to 'Edit', edit_schedule_task_path(@schedule, task), class: 'action-link' %>
+              <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                 data-task-id="<%= task.id %>" data-task-title="<%= task.title %>"
+                 data-task-time="<%= task.display_time %>" data-task-duration="<%= task.duration_min %>"
+                 data-task-type="<%= task.time_type %>" onclick="populateEditModal(event)">Edit</a>
               <%= button_to 'Delete', schedule_task_path(@schedule, task), method: :delete, data: { turbo_confirm: 'Remove task?' }, class: 'action-link delete', form_class: 'inline-delete-form' %>
             </div>
           </div>
@@ -62,6 +65,9 @@
 
 <!-- Include the Add Task Modal -->
 <%= render 'add_task_modal', schedule: @schedule %>
+
+<!-- Include the Edit Task Modal -->
+<%= render 'edit_task_modal', schedule: @schedule %>
 
 <!-- Include the Optimize Schedule Modal (placeholder for now) -->
 <div class="modal fade" id="optimizeModal" tabindex="-1" aria-labelledby="optimizeModalLabel" aria-hidden="true">
@@ -265,6 +271,7 @@
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
+    cursor: pointer;
   }
 
   .action-link:hover {
@@ -345,6 +352,43 @@
 </style>
 
 <script>
+  function populateEditModal(event) {
+    event.preventDefault();
+
+    const link = event.currentTarget;
+    const taskId = link.dataset.taskId;
+    const taskTitle = link.dataset.taskTitle;
+    const taskTime = link.dataset.taskTime;
+    const taskDuration = link.dataset.taskDuration;
+    const taskType = link.dataset.taskType;
+
+    // Update form action to point to the correct update route
+    const form = document.getElementById('editTaskForm');
+    form.action = `/schedules/<%= @schedule.id %>/tasks/${taskId}`;
+    form.method = 'POST';
+
+    // Add hidden method override for PUT/PATCH
+    let methodInput = form.querySelector('input[name="_method"]');
+    if (!methodInput) {
+      methodInput = document.createElement('input');
+      methodInput.type = 'hidden';
+      methodInput.name = '_method';
+      methodInput.value = 'PATCH';
+      form.appendChild(methodInput);
+    }
+
+    // Populate fields
+    document.querySelector('#editTaskForm #task_title').value = taskTitle;
+    document.querySelector('#editTaskForm #task_duration_min').value = taskDuration;
+
+    // Set time type radio button
+    if (taskType === 'fixed_time') {
+      document.querySelector('#edit_fixed_time').checked = true;
+    } else {
+      document.querySelector('#edit_preferred_time').checked = true;
+    }
+  }
+
   function initializeTimeFieldToggle() {
     console.log('Initializing time field toggle...');
 
