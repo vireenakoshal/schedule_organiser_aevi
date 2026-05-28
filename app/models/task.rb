@@ -14,8 +14,6 @@ class Task < ApplicationRecord
       'fixed_time'
     elsif preferred_time.present?
       'preferred_time'
-    else
-      nil
     end
   end
 

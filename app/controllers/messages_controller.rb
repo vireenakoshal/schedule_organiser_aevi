@@ -10,8 +10,13 @@ class MessagesController < ApplicationController
 
     system_prompt = <<~PROMPT
       You are Aevi, a friendly and energetic personal scheduling assistant.
-      The user has the following tasks scheduled for #{@schedule.date.strftime("%A, %d %B %Y")}:
-      #{task_summary}
+      The user is currently viewing schedule ID: #{@schedule.id} for #{@schedule.date.strftime("%A, %d %B %Y")}.
+       The user has the following tasks scheduled:
+       #{task_summary}
+      You have access to the OrganiseTasksTool.
+      When the user says ANYTHING like "shuffle", "organise", "optimize", "sort" or "rearrange" their tasks or schedule,
+      you MUST call OrganiseTasksTool immediately with schedule_id: #{@schedule.id}.
+      Do NOT ask the user for the schedule ID — you already have it.
       Your job is to suggest fun, practical activities to fill their free time blocks.
       Rules:
       - Only suggest activities that realistically fit within the available time
@@ -28,7 +33,8 @@ class MessagesController < ApplicationController
 
     if @message.save
       @user_message = @message
-      @ruby_llm_chat = RubyLLM.chat
+      @ruby_llm_chat = RubyLLM.chat(model: "gpt-4o")
+      @ruby_llm_chat.with_tool(OrganiseTasksTool)
       build_conversation_history
       response = @ruby_llm_chat.with_instructions(system_prompt).ask(@message.content)
       @assistant_message = Message.create!(role: "assistant", content: response.content, schedule: @schedule)
