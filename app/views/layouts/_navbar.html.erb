@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg" style="background: linear-gradient(135deg, #F5F1ED 0%, #FFF9F5 100%); border-bottom: 2px solid #D97E3B;">
   <div class="container-fluid px-4">
     <!-- Logo and Title -->
-    <a class="navbar-brand d-flex align-items-center gap-2" href="<%= schedules_path %>">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="<%= user_signed_in? ? schedules_path : root_path %>">
       <div style="width: 40px; height: 40px; background-color: #D97E3B; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
         <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;">
           <path d="M8 4h16a2 2 0 012 2v10h-2V6H8v20h6v2H8a2 2 0 01-2-2V6a2 2 0 012-2zm8 8h6v2h-6v-2zm0 4h6v2h-6v-2z" fill="white"/>
@@ -21,16 +21,18 @@
     <!-- Navbar Content (collapses on mobile) -->
     <div class="collapse navbar-collapse" id="navbarContent">
       <div class="ms-auto d-flex align-items-center gap-3 flex-column flex-lg-row">
-        <!-- User Avatar and Email -->
-        <div class="d-flex align-items-center gap-2">
-          <div class="rounded-circle" style="width: 36px; height: 36px; background-color: #D97E3B; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
-            <%= current_user.email.first.upcase %>
+        <% if user_signed_in? %>
+          <!-- User Avatar and Email (only show when logged in) -->
+          <div class="d-flex align-items-center gap-2">
+            <div class="rounded-circle" style="width: 36px; height: 36px; background-color: #D97E3B; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+              <%= current_user.email.first.upcase %>
+            </div>
+            <span class="d-none d-md-inline" style="color: #333; font-size: 14px;"><%= current_user.email %></span>
           </div>
-          <span class="d-none d-md-inline" style="color: #333; font-size: 14px;"><%= current_user.email %></span>
-        </div>
 
-        <!-- Logout Button -->
-        <%= link_to "Log out", destroy_user_session_path, method: :delete, class: "btn", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 8px 20px; border-radius: 6px;" %>
+          <!-- Logout Button -->
+          <%= link_to "Log out", destroy_user_session_path, method: :delete, class: "btn", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 8px 20px; border-radius: 6px;" %>
+        <% end %>
       </div>
     </div>
   </div>
