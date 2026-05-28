@@ -1,57 +1,39 @@
-<% # app/views/schedules/_add_task_modal.html.erb %>
-
-<!-- Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="background-color: #D97E3B; color: white;">
         <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-
       <div class="modal-body">
-        <%= form_with model: [@schedule, Task.new], local: true do |f| %>
+        <div id="add-task-alert" class="alert alert-danger" style="display: none; margin-bottom: 15px;">
+          ⚠️ Please fill in all fields
+        </div>
+
+        <%= form_with model: [@schedule, Task.new], local: true, url: schedule_tasks_path(@schedule), method: :post do |form| %>
           <div class="mb-3">
-            <%= f.label :title, "Task Title", class: "form-label" %>
-            <%= f.text_field :title, placeholder: "e.g., Project Strategy Review", class: "form-control" %>
+            <%= form.label :name, "Task Name", class: "form-label" %>
+            <%= form.text_field :name, id: "task_name", class: "form-control", placeholder: "Enter task name" %>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Date & Time</label>
-            <div class="date-time-row">
-              <div class="date-col">
-                <%= f.label :display_time, "Date", class: "form-label-small" %>
-                <%= f.date_field :display_time, class: "form-control" %>
-              </div>
-              <div class="time-col">
-                <%= f.label :display_time, "Time", class: "form-label-small" %>
-                <%= f.time_field :display_time, class: "form-control" %>
-              </div>
-            </div>
+            <%= form.label :display_time, "Date", class: "form-label" %>
+            <%= form.date_field :display_time, id: "task_date", class: "form-control" %>
           </div>
 
           <div class="mb-3">
-            <%= f.label :duration_min, "Duration (minutes)", class: "form-label" %>
-            <%= f.number_field :duration_min, placeholder: "60", class: "form-control" %>
+            <%= form.label :time_type, "Time Type", class: "form-label" %>
+            <%= form.select :time_type, { "Fixed Time" => "fixed_time", "Preferred Time" => "preferred_time" }, {}, id: "task_time_type", class: "form-select" %>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Time Type</label>
-            <div>
-              <div class="form-check">
-                <%= f.radio_button :time_type, 'fixed_time', class: 'form-check-input' %>
-                <%= f.label :time_type_fixed_time, 'Fixed Time', class: 'form-check-label' %>
-              </div>
-              <div class="form-check">
-                <%= f.radio_button :time_type, 'preferred_time', class: 'form-check-input' %>
-                <%= f.label :time_type_preferred_time, 'Preferred Time (Flexible)', class: 'form-check-label' %>
-              </div>
-            </div>
+            <%= form.label :display_time, "Time", class: "form-label" %>
+            <%= form.time_field :display_time, id: "task_time", class: "form-control" %>
           </div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <%= f.submit "Add Task", class: "btn btn-primary" %>
+            <%= form.submit "Add Task", class: "btn btn-primary", style: "background-color: #D97E3B; border-color: #D97E3B;", onclick: "return validateAddTaskForm()" %>
           </div>
         <% end %>
       </div>
@@ -59,125 +41,25 @@
   </div>
 </div>
 
-<style>
-  .modal-content {
-    background: #f9f9f9;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
+<script>
+  function validateAddTaskForm() {
+    const taskName = document.getElementById('task_name').value.trim();
+    const taskDate = document.getElementById('task_date').value;
+    const taskTime = document.getElementById('task_time').value;
+
+    if (!taskName || !taskDate || !taskTime) {
+      const alertBox = document.getElementById('add-task-alert');
+      alertBox.style.display = 'block';
+      return false;
+    } else {
+      const alertBox = document.getElementById('add-task-alert');
+      alertBox.style.display = 'none';
+      return true;
+    }
   }
 
-  .modal-header {
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
-  }
-
-  .modal-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2d2d2d;
-  }
-
-  .modal-body {
-    padding: 24px;
-  }
-
-  .form-label {
-    font-weight: 500;
-    color: #2d2d2d;
-    margin-bottom: 8px;
-    display: block;
-  }
-
-  .form-label-small {
-    font-weight: 500;
-    color: #2d2d2d;
-    margin-bottom: 6px;
-    font-size: 13px;
-    display: block;
-  }
-
-  .form-control {
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 14px;
-    width: 100%;
-  }
-
-  .form-control:focus {
-    border-color: #d97c3a;
-    box-shadow: 0 0 0 2px rgba(217, 124, 58, 0.1);
-    outline: none;
-  }
-
-  .date-time-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .date-col,
-  .time-col {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .form-check {
-    margin-bottom: 12px;
-  }
-
-  .form-check-input {
-    margin-right: 8px;
-    cursor: pointer;
-    accent-color: #d97c3a;
-  }
-
-  .form-check-label {
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .modal-footer {
-    border-top: 1px solid #e0e0e0;
-    background: white;
-    padding: 16px 24px;
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-  }
-
-  .btn {
-    padding: 12px 24px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-
-  .btn-primary {
-    background: #d97c3a;
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background: #c26b2e;
-  }
-
-  .btn-secondary {
-    background: white;
-    color: #2d2d2d;
-    border: 1px solid #ddd;
-  }
-
-  .btn-secondary:hover {
-    background: #f9f9f9;
-    border-color: #ccc;
-  }
-
-  .mb-3 {
-    margin-bottom: 20px;
-  }
-</style>
+  // Hide alert when user starts typing
+  document.getElementById('task_name')?.addEventListener('input', function() {
+    document.getElementById('add-task-alert').style.display = 'none';
+  });
+</script>
