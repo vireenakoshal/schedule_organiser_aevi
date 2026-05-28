@@ -10,7 +10,7 @@
     </div>
 
     <div class="header-buttons">
-      <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#optimizeModal">
+      <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#exampleModal">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2v20M2 12h20"></path>
         </svg>
@@ -56,9 +56,15 @@
       <% end %>
     <% end %>
   </div>
-
+<div>
+   <!-- Button trigger modal -->
+  <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    CHAT TO AEVI - OPTIMISE YOUR DAY
+  </button>
+</div>
   <!-- Back Link -->
   <div class="footer-actions">
+
     <%= link_to '← Back to Schedules', schedules_path, class: 'back-link' %>
   </div>
 </div>
@@ -351,52 +357,6 @@
   }
 </style>
 
-<script>
-  function populateEditModal(event) {
-    event.preventDefault();
-
-    const link = event.currentTarget;
-    const taskId = link.dataset.taskId;
-    const taskTitle = link.dataset.taskTitle;
-    const taskTime = link.dataset.taskTime;
-    const taskDuration = link.dataset.taskDuration;
-    const taskType = link.dataset.taskType;
-
-    // Update form action to point to the correct update route
-    const form = document.getElementById('editTaskForm');
-    form.action = `/schedules/<%= @schedule.id %>/tasks/${taskId}`;
-    form.method = 'POST';
-
-    // Add hidden method override for PUT/PATCH
-    let methodInput = form.querySelector('input[name="_method"]');
-    if (!methodInput) {
-      methodInput = document.createElement('input');
-      methodInput.type = 'hidden';
-      methodInput.name = '_method';
-      methodInput.value = 'PATCH';
-      form.appendChild(methodInput);
-    }
-
-    // Populate fields
-    document.querySelector('#editTaskForm #task_title').value = taskTitle;
-    document.querySelector('#editTaskForm #task_duration_min').value = taskDuration;
-
-    // Set time type radio button
-    if (taskType === 'fixed_time') {
-      document.querySelector('#edit_fixed_time').checked = true;
-    } else {
-      document.querySelector('#edit_preferred_time').checked = true;
-    }
-  }
-
-  function initializeTimeFieldToggle() {
-    console.log('Initializing time field toggle...');
-
- <!-- Button trigger modal -->
-  <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    CHAT TO AEVI - OPTIMISE YOUR DAY
-  </button>
-
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -455,6 +415,45 @@
     const messages = document.getElementById("messages");
     if (messages) messages.scrollTop = messages.scrollHeight;
   });
+
+  function populateEditModal(event) {
+    event.preventDefault();
+
+    const link = event.currentTarget;
+    const taskId = link.dataset.taskId;
+    const taskTitle = link.dataset.taskTitle;
+    const taskTime = link.dataset.taskTime;
+    const taskDuration = link.dataset.taskDuration;
+    const taskType = link.dataset.taskType;
+
+    // Update form action to point to the correct update route
+    const form = document.getElementById('editTaskForm');
+    form.action = `/schedules/<%= @schedule.id %>/tasks/${taskId}`;
+    form.method = 'POST';
+
+    // Add hidden method override for PUT/PATCH
+    let methodInput = form.querySelector('input[name="_method"]');
+    if (!methodInput) {
+      methodInput = document.createElement('input');
+      methodInput.type = 'hidden';
+      methodInput.name = '_method';
+      methodInput.value = 'PATCH';
+      form.appendChild(methodInput);
+    }
+
+    // Populate fields
+    document.querySelector('#editTaskForm #task_title').value = taskTitle;
+    document.querySelector('#editTaskForm #task_duration_min').value = taskDuration;
+
+    // Set time type radio button
+    if (taskType === 'fixed_time') {
+      document.querySelector('#edit_fixed_time').checked = true;
+    } else {
+      document.querySelector('#edit_preferred_time').checked = true;
+    }
+  }
+
+  function initializeTimeFieldToggle() {
     const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
     console.log('Found radios:', timeTypeRadios.length);
 
