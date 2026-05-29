@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
-  before_action :set_schedule, only: %i[create create_with_ai destroy edit update]
-  before_action :set_task, only: %i[destroy edit update]
+ before_action :set_schedule, only: %i[create create_with_ai destroy edit update toggle_complete]
+  before_action :set_task, only: %i[destroy edit update toggle_complete]
 
   def create
     @task = @schedule.tasks.build(task_params)
@@ -82,28 +82,28 @@ class TasksController < ApplicationController
   def edit
   end
 
-  def update
-    if params[:completed].present?
-      @task.update(completed: params[:completed] == 'true')
-      redirect_to @schedule, notice: "Task updated successfully."
-    end
-    
-    permitted = task_params
+def update
+  permitted = task_params
 
-    if permitted[:preferred_time].present? && permitted[:fixed_time].blank?
-      duration  = permitted[:duration_min] || @task.duration_min
-      free_slot = @schedule.next_available_slot(
-        Time.parse(permitted[:preferred_time].to_s),
-        duration.to_i
-      )
-      permitted[:preferred_time] = free_slot
-    end
+  if permitted[:preferred_time].present? && permitted[:fixed_time].blank?
+    duration  = permitted[:duration_min] || @task.duration_min
+    free_slot = @schedule.next_available_slot(
+      Time.parse(permitted[:preferred_time].to_s),
+      duration.to_i
+    )
+    permitted[:preferred_time] = free_slot
+  end
 
-    if @task.update(permitted)
-      redirect_to @schedule, notice: "Task updated successfully."
-    else
-      redirect_to @schedule, alert: @task.errors.full_messages.join(", ")
-    end
+  if @task.update(permitted)
+    redirect_to @schedule, notice: "Task updated successfully."
+  else
+    redirect_to @schedule, alert: @task.errors.full_messages.join(", ")
+  end
+end
+
+  def toggle_complete
+  @task.update!(completed: !@task.completed)
+  redirect_to @schedule
   end
 
   private

@@ -107,7 +107,7 @@
             "></div>
 
             <!-- Task card -->
-            <div class="task-card">
+            <div class="task-card <%= 'completed' if task.completed? %>">
               <div class="task-meta">
                 <span class="task-time"><%= task.display_time&.strftime('%I:%M %p') %></span>
                 <span class="task-duration"><%= task.duration_min %> mins</span>
@@ -116,16 +116,16 @@
               <h3 class="task-title"><%= task.category %></h3>
               <div class="task-actions">
                 <a href="#"
-                   class="action-link"
-                   data-bs-toggle="modal"
-                   data-bs-target="#editTaskModal"
-                   data-task-id="<%= task.id %>"
-                   data-schedule-id="<%= @schedule.id %>"
-                   data-task-title="<%= task.category %>"
-                   data-task-time="<%= task.display_time&.strftime('%H:%M') %>"
-                   data-task-duration="<%= task.duration_min %>"
-                   data-task-type="<%= task.time_type %>"
-                   onclick="populateEditModal(event)">Edit</a>
+                  class="action-link"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editTaskModal"
+                  data-task-id="<%= task.id %>"
+                  data-schedule-id="<%= @schedule.id %>"
+                  data-task-title="<%= task.category %>"
+                  data-task-time="<%= task.display_time&.strftime('%H:%M') %>"
+                  data-task-duration="<%= task.duration_min %>"
+                  data-task-type="<%= task.time_type %>"
+                  onclick="populateEditModal(event)">Edit</a>
                 <%= button_to 'Delete', schedule_task_path(@schedule, task),
                     method: :delete,
                     data: { turbo_confirm: 'Remove task?' },
