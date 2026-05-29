@@ -1,5 +1,8 @@
 <% # app/views/schedules/show.html.erb %>
 
+
+<%= button_to "Create task with ai ✨", create_with_ai_schedule_tasks_path(@schedule), method: :post, class: "btn-optimize" %>
+
 <div class="schedule-container">
   <!-- Header -->
   <div class="schedule-header">

@@ -74,3 +74,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Gemfile
+gem "ruby_llm", "~> 1.2.0"
