@@ -1,71 +1,16 @@
-<% # app/views/schedules/_edit_task_modal.html.erb %>
-
 <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
+
       <div class="modal-header">
         <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <%= form_with(model: [schedule, @edit_task || Task.new], local: true, id: "editTaskForm") do |form| %>
+      <%= form_with url: "", method: :post, local: true, id: "editTaskForm" do |form| %>
+        <input type="hidden" name="_method" value="PATCH">
         <div class="modal-body">
-          <% if @edit_task.present? && @edit_task.errors.any? %>
-            <div id="error_explanation" class="error-alert">
-              <h4><%= pluralize(@edit_task.errors.count, "error") %> prohibited this task from being saved:</h4>
-              <ul>
-                <% @edit_task.errors.full_messages.each do |message| %>
-                  <li><%= message %></li>
-                <% end %>
-              </ul>
-            </div>
-          <% end %>
-
-          <!-- Task Title -->
-          <div class="modal-form-group">
-            <%= form.label :title, "Task Title", class: "form-label" %>
-            <%= form.text_field :title, class: "form-control", placeholder: "What's the task?" %>
-          </div>
-
-          <!-- Date and Time Selection -->
-          <div class="modal-form-group">
-            <label class="form-label">Date & Time</label>
-            <div class="date-time-row">
-              <div class="date-col">
-                <%= form.label :display_time, "Date", class: "form-label-small" %>
-                <%= form.date_field :display_time, class: "form-control" %>
-              </div>
-              <div class="time-col">
-                <%= form.label :display_time, "Time", class: "form-label-small" %>
-                <%= form.time_field :display_time, class: "form-control" %>
-              </div>
-            </div>
-          </div>
-
-          <!-- Duration -->
-          <div class="modal-form-group">
-            <%= form.label :duration_min, "Duration (minutes)", class: "form-label" %>
-            <%= form.number_field :duration_min, class: "form-control", min: 1, placeholder: "e.g., 30" %>
-          </div>
-
-          <!-- Time Type -->
-          <div class="modal-form-group">
-            <%= form.label :time_type, "Time Type", class: "form-label" %>
-            <div class="time-type-options">
-              <div class="form-check">
-                <%= form.radio_button :time_type, 'fixed_time', class: "form-check-input", id: "edit_fixed_time" %>
-                <label class="form-check-label" for="edit_fixed_time">
-                  Fixed Time (Must complete at this time)
-                </label>
-              </div>
-              <div class="form-check">
-                <%= form.radio_button :time_type, 'preferred_time', class: "form-check-input", id: "edit_preferred_time" %>
-                <label class="form-check-label" for="edit_preferred_time">
-                  Preferred Time (Can adjust if needed)
-                </label>
-              </div>
-            </div>
-          </div>
+          <%= render "tasks/form_fields", prefix: "edit" %>
         </div>
 
         <div class="modal-footer">
@@ -73,149 +18,7 @@
           <%= form.submit "Save Changes", class: "btn btn-primary" %>
         </div>
       <% end %>
+
     </div>
   </div>
 </div>
-
-<style>
-  #editTaskModal .modal-form-group {
-    margin-bottom: 20px;
-  }
-
-  #editTaskModal .form-label {
-    font-weight: 600;
-    color: #2d2d2d;
-    margin-bottom: 8px;
-    font-size: 14px;
-    display: block;
-  }
-
-  #editTaskModal .form-label-small {
-    font-weight: 600;
-    color: #2d2d2d;
-    margin-bottom: 6px;
-    font-size: 13px;
-    display: block;
-  }
-
-  #editTaskModal .form-control {
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    font-family: inherit;
-    width: 100%;
-  }
-
-  #editTaskModal .form-control:focus {
-    outline: none;
-    border-color: #d97c3a;
-    box-shadow: 0 0 0 3px rgba(217, 124, 58, 0.1);
-  }
-
-  #editTaskModal .date-time-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  #editTaskModal .date-col,
-  #editTaskModal .time-col {
-    display: flex;
-    flex-direction: column;
-  }
-
-  #editTaskModal .time-type-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  #editTaskModal .form-check {
-    display: flex;
-    align-items: center;
-  }
-
-  #editTaskModal .form-check-input {
-    width: 18px;
-    height: 18px;
-    margin-right: 8px;
-    cursor: pointer;
-    accent-color: #d97c3a;
-  }
-
-  #editTaskModal .form-check-label {
-    margin-bottom: 0;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  #editTaskModal .error-alert {
-    background: #fee;
-    border: 1px solid #fcc;
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 16px;
-    color: #c33;
-  }
-
-  #editTaskModal .error-alert h4 {
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
-
-  #editTaskModal .error-alert ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  #editTaskModal .error-alert li {
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-
-  #editTaskModal .modal-content {
-    background: #f9f9f9;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-  }
-
-  #editTaskModal .modal-header {
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
-  }
-
-  #editTaskModal .modal-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d2d2d;
-  }
-
-  #editTaskModal .modal-footer {
-    border-top: 1px solid #e0e0e0;
-    background: white;
-  }
-
-  #editTaskModal .btn-primary {
-    background: #d97c3a;
-    border-color: #d97c3a;
-    color: white;
-  }
-
-  #editTaskModal .btn-primary:hover {
-    background: #c26b2e;
-    border-color: #c26b2e;
-  }
-
-  #editTaskModal .btn-secondary {
-    background: white;
-    border-color: #ddd;
-    color: #666;
-  }
-
-  #editTaskModal .btn-secondary:hover {
-    background: #f5f5f5;
-    border-color: #ccc;
-  }
-</style>

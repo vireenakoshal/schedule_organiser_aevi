@@ -1,66 +1,99 @@
 <div style="background: #f5f1ed; min-height: 100vh; padding: 40px 20px;">
   <div style="max-width: 1200px; margin: 0 auto;">
+
     <!-- Header -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-      <div>
-        <h1 style="font-size: 36px; font-weight: 700; color: #2d2d2d; margin: 0;">My Schedules</h1>
-        <p style="color: #999; font-size: 14px; margin: 8px 0 0 0;">Organize your day with AI optimization</p>
-      </div>
-      <%= link_to "➕ Create New Schedule", new_schedule_path, style: "background: #d97c3a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;" %>
-    </div>
+ <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 16px;">
+  <div>
+    <h1 style="font-size: 36px; font-weight: 700; color: #2d2d2d; margin: 0;">My Schedules</h1>
+    <p style="color: #999; font-size: 14px; margin: 8px 0 0 0;">Organize your day with AI optimization</p>
+  </div>
+  <%= link_to new_schedule_path,
+      style: "background: #d97c3a; color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; white-space: nowrap; align-self: flex-start;" do %>
+    ➕ Create New Schedule
+  <% end %>
+</div>
 
     <!-- Schedules Grid -->
     <% if @schedules.any? %>
       <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
+
         <% @schedules.each do |schedule| %>
           <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid #d97c3a;">
+
+            <!-- Schedule Name & Date -->
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
               <div>
                 <h3 style="font-size: 20px; font-weight: 700; color: #2d2d2d; margin: 0 0 4px 0;">
                   <%= schedule.name.presence || schedule.date.strftime("%A") %>
                 </h3>
-                <% if schedule.name.present? %>
-                  <p style="color: #999; font-size: 13px; margin: 0;">
+                <p style="color: #999; font-size: 13px; margin: 0;">
+                  <% if schedule.name.present? %>
                     <%= schedule.date.strftime("%A, %B %d") %>
-                  </p>
-                <% else %>
-                  <p style="color: #999; font-size: 13px; margin: 0;">
+                  <% else %>
                     <%= schedule.date.strftime("%B %d") %>
-                  </p>
-                <% end %>
+                  <% end %>
+                </p>
               </div>
               <span style="background: #fff3e0; color: #d97c3a; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap;">
                 <%= schedule.date.strftime("%b %d") %>
               </span>
             </div>
 
+            <!-- Tasks Count -->
             <div style="margin-bottom: 16px;">
               <p style="color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase;">Tasks</p>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="background: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600;">
-                  <%= schedule.tasks.count %> task<%= schedule.tasks.count != 1 ? 's' : '' %>
-                </span>
+              <span style="background: #e3f2fd; color: #1976d2; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 600;">
+                <%= schedule.tasks.count %> task<%= schedule.tasks.count != 1 ? 's' : '' %>
+              </span>
+            </div>
+
+            <!-- Vibe Badge -->
+            <% if schedule.vibe_message %>
+              <div class="vibe-badge" style="
+                display: inline-block;
+                margin-bottom: 16px;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                color: white;
+                background-color: <%= schedule.vibe_color %>;
+                box-shadow: 0 0 10px <%= schedule.vibe_color %>, 0 0 20px <%= schedule.vibe_color %>40;
+                animation: glow 2s ease-in-out infinite alternate;">
+                <%= schedule.vibe_message %>
+              </div>
+            <% end %>
+
+            <!-- Actions -->
+            <div>
+              <p style="color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase;">Actions</p>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <%= link_to "View", schedule_path(schedule),
+                    style: "background: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
+                <%= link_to "Edit", edit_schedule_path(schedule),
+                    style: "background: #fff3e0; color: #d97c3a; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
+                <%= button_to "Delete", schedule_path(schedule),
+                    method: :delete,
+                    data: { turbo_confirm: "Sure?" },
+                    form_class: "inline-schedule-delete-form",
+                    style: "background: #ffebee; color: #c62828; padding: 8px 12px; border-radius: 6px; font-size: 13px; font-weight: 600;" %>
               </div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-              <p style="color: #999; font-size: 12px; margin: 0 0 8px 0; text-transform: uppercase;">Actions</p>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <%= link_to "View", schedule_path(schedule), style: "background: #e3f2fd; color: #1976d2; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
-                <%= link_to "Edit", edit_schedule_path(schedule), style: "background: #fff3e0; color: #d97c3a; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
-                <%= button_to "Delete", schedule_path(schedule), method: :delete, data: { turbo_confirm: "Sure?" }, form_class: "inline-schedule-delete-form", style: "background: #ffebee; color: #c62828; padding: 8px 12px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600;" %>
-              </div>
-            </div>
           </div>
         <% end %>
+
       </div>
+
     <% else %>
       <div style="background: white; border-radius: 12px; padding: 40px; text-align: center; border-left: 4px solid #d97c3a;">
         <h3 style="color: #2d2d2d; font-size: 20px; margin: 0 0 12px 0;">No schedules yet!</h3>
         <p style="color: #999; margin: 0 0 20px 0;">Start organizing your day with AI-optimized scheduling.</p>
-        <%= link_to "Create your first schedule", new_schedule_path, style: "background: #d97c3a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;" %>
+        <%= link_to "Create your first schedule", new_schedule_path,
+            style: "background: #d97c3a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;" %>
       </div>
     <% end %>
+
   </div>
 </div>
 
@@ -78,11 +111,26 @@
     font-weight: 600 !important;
     border: none !important;
     cursor: pointer !important;
-    text-decoration: none !important;
     font-family: inherit !important;
   }
 
   .inline-schedule-delete-form button:hover {
     opacity: 0.8;
+  }
+
+  @keyframes glow {
+    from { box-shadow: 0 0 6px #d97c3a, 0 0 12px #d97c3a; }
+    to   { box-shadow: 0 0 14px #d97c3a, 0 0 28px #d97c3a; }
+  }
+
+  .vibe-badge {
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 0.03em;
+    cursor: default;
+    transition: transform 0.2s ease;
+  }
+
+  .vibe-badge:hover {
+    transform: scale(1.04);
   }
 </style>
