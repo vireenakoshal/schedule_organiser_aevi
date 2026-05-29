@@ -1,65 +1,81 @@
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
+
       <div class="modal-header" style="background-color: #D97E3B; color: white;">
         <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div id="add-task-alert" class="alert alert-danger" style="display: none; margin-bottom: 15px;">
-          ⚠️ Please fill in all fields
+
+      <%= form_with url: schedule_tasks_path(schedule), method: :post, local: true, id: "addTaskForm" do |form| %>
+        <div class="modal-body">
+
+          <div id="add-task-alert" class="alert alert-danger" style="display: none;">
+            ⚠️ Please fill in all fields
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="task_category">Task Name</label>
+            <input type="text" name="task[category]" id="task_category" class="form-control" placeholder="What's the task?">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="task_duration_min">Duration (minutes)</label>
+            <input type="number" name="task[duration_min]" id="task_duration_min" class="form-control" min="5" placeholder="e.g. 30">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Time Type</label>
+            <div>
+              <div class="form-check">
+                <input type="radio" name="task[time_type]" value="fixed_time" class="form-check-input" id="add_fixed_time">
+                <label class="form-check-label" for="add_fixed_time">Fixed Time</label>
+              </div>
+              <div class="form-check">
+                <input type="radio" name="task[time_type]" value="preferred_time" class="form-check-input" id="add_preferred_time">
+                <label class="form-check-label" for="add_preferred_time">Preferred Time</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3" id="addFixedTimeField" style="display: none;">
+            <label class="form-label" for="task_fixed_time">Fixed Time</label>
+            <input type="time" name="task[fixed_time]" id="task_fixed_time" class="form-control">
+          </div>
+
+          <div class="mb-3" id="addPreferredTimeField" style="display: none;">
+            <label class="form-label" for="task_preferred_time">Preferred Time</label>
+            <input type="time" name="task[preferred_time]" id="task_preferred_time" class="form-control">
+          </div>
+
         </div>
 
-        <%= form_with model: [@schedule, Task.new], local: true, url: schedule_tasks_path(@schedule), method: :post do |form| %>
-          <div class="mb-3">
-            <%= form.label :name, "Task Name", class: "form-label" %>
-            <%= form.text_field :name, id: "task_name", class: "form-control", placeholder: "Enter task name" %>
-          </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <%= form.submit "Add Task", class: "btn btn-primary", style: "background-color: #D97E3B; border-color: #D97E3B;" %>
+        </div>
+      <% end %>
 
-          <div class="mb-3">
-            <%= form.label :display_time, "Date", class: "form-label" %>
-            <%= form.date_field :display_time, id: "task_date", class: "form-control" %>
-          </div>
-
-          <div class="mb-3">
-            <%= form.label :time_type, "Time Type", class: "form-label" %>
-            <%= form.select :time_type, { "Fixed Time" => "fixed_time", "Preferred Time" => "preferred_time" }, {}, id: "task_time_type", class: "form-select" %>
-          </div>
-
-          <div class="mb-3">
-            <%= form.label :display_time, "Time", class: "form-label" %>
-            <%= form.time_field :display_time, id: "task_time", class: "form-control" %>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <%= form.submit "Add Task", class: "btn btn-primary", style: "background-color: #D97E3B; border-color: #D97E3B;", onclick: "return validateAddTaskForm()" %>
-          </div>
-        <% end %>
-      </div>
     </div>
   </div>
 </div>
 
 <script>
-  function validateAddTaskForm() {
-    const taskName = document.getElementById('task_name').value.trim();
-    const taskDate = document.getElementById('task_date').value;
-    const taskTime = document.getElementById('task_time').value;
+  document.addEventListener('shown.bs.modal', function(event) {
+    if (event.target.id !== 'addTaskModal') return;
 
-    if (!taskName || !taskDate || !taskTime) {
-      const alertBox = document.getElementById('add-task-alert');
-      alertBox.style.display = 'block';
-      return false;
-    } else {
-      const alertBox = document.getElementById('add-task-alert');
-      alertBox.style.display = 'none';
-      return true;
+    const fixedRadio     = document.getElementById('add_fixed_time');
+    const preferredRadio = document.getElementById('add_preferred_time');
+    const fixedField     = document.getElementById('addFixedTimeField');
+    const preferredField = document.getElementById('addPreferredTimeField');
+
+    function toggle() {
+      fixedField.style.display     = fixedRadio.checked     ? 'block' : 'none';
+      preferredField.style.display = preferredRadio.checked ? 'block' : 'none';
     }
-  }
 
-  // Hide alert when user starts typing
-  document.getElementById('task_name')?.addEventListener('input', function() {
-    document.getElementById('add-task-alert').style.display = 'none';
+    fixedRadio.addEventListener('change', toggle);
+    preferredRadio.addEventListener('change', toggle);
+    toggle();
   });
 </script>

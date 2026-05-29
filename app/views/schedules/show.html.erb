@@ -1,9 +1,30 @@
 <% # app/views/schedules/show.html.erb %>
 
 
-<%= button_to "Create task with ai ✨", create_with_ai_schedule_tasks_path(@schedule), method: :post, class: "btn-optimize" %>
+<%= button_to "Create task with ai ✨",
+    create_with_ai_schedule_tasks_path(@schedule),
+    method: :post,
+    class: "btn-optimize",
+    data: {
+      turbo_confirm: "Add an AI-generated task to your schedule?",
+      disable_with: "Creating..."
+    } %>
 
 <div class="schedule-container">
+  <% if alert %>
+  <div style="
+    background-color: #FFF3CD;
+    border: 1px solid #C1713A;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: #7A6E63;
+    font-family: 'Arial', sans-serif;">
+    ⚠️ <%= alert %>
+  </div>
+  <% end %>
+
   <!-- Header -->
   <div class="schedule-header">
     <div>
@@ -27,40 +48,100 @@
 
   <!-- Tasks Timeline -->
   <div class="tasks-timeline">
-    <% if @tasks.empty?%>
-      <div class="empty-state">
-        <p>No tasks yet. Add one to get started!</p>
+  <% if @tasks.empty? %>
+    <div class="empty-state">
+      <p>No tasks yet. Add one to get started!</p>
+    </div>
+  <% else %>
+    <div style="display: flex; gap: 0;">
+
+      <!-- Time markers column -->
+      <div style="width: 64px; flex-shrink: 0; padding-top: 2px;">
+        <% @tasks.each do |task| %>
+          <div style="height: 90px; display: flex; align-items: flex-start;">
+            <span style="font-size: 12px; color: #9c8c7a; font-weight: 500;">
+              <%= task.display_time&.strftime('%H:%M') %>
+            </span>
+          </div>
+        <% end %>
       </div>
-    <% else %>
-      <div class="timeline-line"></div>
 
-      <% @tasks.each do |task| %>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
+      <!-- Timeline line + cards -->
+      <div style="position: relative; padding-left: 20px; flex: 1;">
 
-          <div class="task-card">
-            <div class="task-meta">
-              <span class="task-time"><%= task.display_time.strftime('%I:%M %p') %></span>
-              <span class="task-duration"><%= task.duration_min %> mins</span>
-              <span class="task-badge <%= task.time_type %>"><%= task.time_badge %></span>
-            </div>
+        <!-- Gradient line -->
+        <div style="
+          position: absolute;
+          left: 0;
+          top: 8px;
+          bottom: 8px;
+          width: 2px;
+          background: linear-gradient(
+            to bottom,
+            #FFD966,
+            #F4A940,
+            #D97C3A,
+            #C1613A,
+            #8B3A2A
+          );
+        "></div>
 
-            <h3 class="task-title"><%= task.category %></h3>
+        <% @tasks.each_with_index do |task, index| %>
+          <%
+            total    = @tasks.length
+            progress = total > 1 ? index.to_f / (total - 1) : 0
+            dot_color = interpolate_day_color(progress)
+          %>
 
-            <div class="task-actions">
-              <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#editTaskModal"
-                 data-task-id="<%= task.id %>" data-task-title="<%= task.title %>"
-                 data-task-time="<%= task.display_time %>" data-task-duration="<%= task.duration_min %>"
-                 data-task-type="<%= task.time_type %>" onclick="populateEditModal(event)">Edit</a>
-              <%= button_to 'Delete', schedule_task_path(@schedule, task), method: :delete, data: { turbo_confirm: 'Remove task?' }, class: 'action-link delete', form_class: 'inline-delete-form' %>
+          <div style="margin-bottom: 16px; position: relative;">
+            <!-- Gradient dot -->
+            <div style="
+              position: absolute;
+              left: -27px;
+              top: 12px;
+              width: 13px;
+              height: 13px;
+              border-radius: 50%;
+              background: <%= dot_color %>;
+              border: 2px solid #f5f0e8;
+            "></div>
+
+            <!-- Task card -->
+            <div class="task-card">
+              <div class="task-meta">
+                <span class="task-time"><%= task.display_time&.strftime('%I:%M %p') %></span>
+                <span class="task-duration"><%= task.duration_min %> mins</span>
+                <span class="task-badge <%= task.time_type %>"><%= task.time_badge %></span>
+              </div>
+              <h3 class="task-title"><%= task.category %></h3>
+              <div class="task-actions">
+                <a href="#"
+                   class="action-link"
+                   data-bs-toggle="modal"
+                   data-bs-target="#editTaskModal"
+                   data-task-id="<%= task.id %>"
+                   data-schedule-id="<%= @schedule.id %>"
+                   data-task-title="<%= task.category %>"
+                   data-task-time="<%= task.display_time&.strftime('%H:%M') %>"
+                   data-task-duration="<%= task.duration_min %>"
+                   data-task-type="<%= task.time_type %>"
+                   onclick="populateEditModal(event)">Edit</a>
+                <%= button_to 'Delete', schedule_task_path(@schedule, task),
+                    method: :delete,
+                    data: { turbo_confirm: 'Remove task?' },
+                    class: 'action-link delete',
+                    form_class: 'inline-delete-form' %>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
-    <% end %>
-  </div>
+        <% end %>
+      </div>
 
-  <!-- Chat to Aevi Button -->
+    </div>
+  <% end %>
+</div>
+
+  <!-- Chat Button -->
   <div style="text-align: center; margin: 50px 0;">
     <button type="button" class="btn-chat-aevi" data-bs-toggle="modal" data-bs-target="#exampleModal">
       💬 Chat to Aevi
@@ -71,24 +152,36 @@
   <div class="footer-actions">
     <%= link_to '← Back to Schedules', schedules_path, class: 'back-link' %>
   </div>
+
 </div>
 
-<!-- Include the Add Task Modal -->
+<!-- Modals -->
 <%= render 'add_task_modal', schedule: @schedule %>
-
-<!-- Include the Edit Task Modal -->
 <%= render 'edit_task_modal', schedule: @schedule %>
 
-<!-- Include the Optimize Schedule Modal (placeholder for now) -->
-<div class="modal fade" id="optimizeModal" tabindex="-1" aria-labelledby="optimizeModalLabel" aria-hidden="true">
+<!-- Chat Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="optimizeModalLabel">Optimize My Schedule</h5>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Lets optimise your day together! chat with Aevi for inspiration</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>This feature will use AI to optimize your schedule. Coming soon!</p>
+        <% user_message_count = @schedule.messages.where(role: "user").count %>
+        <% if user_message_count >= 20 %>
+          <div style="background-color: #FFF3CD; border: 1px solid #C1713A; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #7A6E63;">
+            You've reached the 20 message limit for this schedule. Start a new schedule to keep chatting with Aevi.
+          </div>
+        <% end %>
+        <div id="messages" style="max-height: 350px; overflow-y: auto; margin-bottom: 1rem;">
+          <%= render @schedule.messages %>
+        </div>
+        <% unless user_message_count >= 20 %>
+          <div id="message_form">
+            <%= render "messages/form", schedule: @schedule, message: @message %>
+          </div>
+        <% end %>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -97,425 +190,30 @@
   </div>
 </div>
 
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    background: #f5f0e8;
-    font-family: 'Georgia', serif;
-    color: #2d2d2d;
-  }
-
-  .schedule-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
-
-  /* Header */
-  .schedule-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 40px;
-  }
-
-  .schedule-label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: #d97c3a;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
-
-  .schedule-title {
-    font-size: 42px;
-    font-weight: 700;
-    color: #2d2d2d;
-    line-height: 1.2;
-  }
-
-  .header-buttons {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .btn-optimize,
-  .btn-add-task {
-    padding: 12px 20px;
-    border: 2px solid #d97c3a;
-    background: white;
-    color: #d97c3a;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: inherit;
-  }
-
-  .btn-optimize:hover {
-    background: #f5f1ed;
-  }
-
-  .btn-add-task {
-    background: #d97c3a;
-    color: white;
-    border-color: #d97c3a;
-  }
-
-  .btn-add-task:hover {
-    background: #c26b2e;
-    border-color: #c26b2e;
-  }
-
-  /* Chat to Aevi Button */
-  .btn-chat-aevi {
-    padding: 14px 40px;
-    background-color: #d97c3a;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: inherit;
-  }
-
-  .btn-chat-aevi:hover {
-    background-color: #c26b2e;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(217, 124, 58, 0.3);
-  }
-
-  /* Timeline */
-  .tasks-timeline {
-    position: relative;
-    margin-bottom: 40px;
-  }
-
-  .timeline-line {
-    position: absolute;
-    left: 23px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #e0d5c8;
-  }
-
-  .timeline-item {
-    display: flex;
-    gap: 32px;
-    margin-bottom: 24px;
-    position: relative;
-  }
-
-  .timeline-dot {
-    width: 48px;
-    height: 48px;
-    background: #d97c3a;
-    border-radius: 50%;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
-    margin-top: 4px;
-  }
-
-  .task-card {
-    flex: 1;
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    transition: all 0.3s ease;
-  }
-
-  .task-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-
-  .task-meta {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-  }
-
-  .task-time {
-    font-size: 14px;
-    font-weight: 600;
-    color: #2d2d2d;
-  }
-
-  .task-duration {
-    font-size: 13px;
-    color: #666;
-  }
-
-  .task-badge {
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .task-badge.fixed_time {
-    background: #C1713A;
-    color: white;
-  }
-
-  .task-badge.preferred_time {
-    background: #E8DDD0;
-    color: #2d2d2d;
-  }
-
-  .task-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d2d2d;
-    margin-bottom: 12px;
-  }
-
-  .task-actions {
-    display: flex;
-    gap: 16px;
-    font-size: 14px;
-  }
-
-  .action-link {
-    color: #d97c3a;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-    cursor: pointer;
-  }
-
-  .action-link:hover {
-    color: #c26b2e;
-  }
-
-  .action-link.delete {
-    color: #e74c3c;
-  }
-
-  .action-link.delete:hover {
-    color: #c0392b;
-  }
-
-  .inline-delete-form {
-    display: inline;
-  }
-
-  .inline-delete-form button {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 60px 24px;
-    color: #999;
-    font-size: 16px;
-  }
-
-  /* Footer */
-  .footer-actions {
-    margin-top: 40px;
-    padding-top: 24px;
-    border-top: 1px solid #e0d5c8;
-  }
-
-  .back-link {
-    color: #d97c3a;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-
-  .back-link:hover {
-    color: #c26b2e;
-  }
-
-  /* Modal Overrides */
-  .modal-content {
-    background: #f9f9f9;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-  }
-
-  .modal-header {
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
-  }
-
-  .modal-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2d2d2d;
-  }
-
-  .modal-body {
-    padding: 24px;
-  }
-
-  .modal-footer {
-    border-top: 1px solid #e0e0e0;
-    background: white;
-  }
-</style>
-
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Lets optimise your day together! chat with Aevi for inspiration</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-
-        <div class="modal-body">
-          <% user_message_count = @schedule.messages.where(role: "user").count %>
-
-          <% if user_message_count >= 20 %>
-            <div style="
-              background-color: #FFF3CD;
-              border: 1px solid #C1713A;
-              border-radius: 8px;
-              padding: 0.75rem 1rem;
-              margin-bottom: 1rem;
-              font-size: 0.85rem;
-              color: #7A6E63;
-              font-family: 'Arial', sans-serif;">
-              You've reached the 20 message limit for this schedule. Start a new schedule to keep chatting with Aevi.
-            </div>
-          <% end %>
-
-          <div id="messages" style="max-height: 350px; overflow-y: auto; margin-bottom: 1rem;">
-            <%= render @schedule.messages %>
-          </div>
-
-          <% unless user_message_count >= 10 %>
-          <div id="message_form">
-            <%= render "messages/form", schedule: @schedule, message: @message %>
-          </div>
-          <% end %>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-</div>
 
 <script>
   document.addEventListener("turbo:after-stream-render", () => {
     const messages = document.getElementById("messages");
     if (messages) messages.scrollTop = messages.scrollHeight;
   });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const aiForm = document.querySelector('form[action*="create_with_ai"]');
+    if (!aiForm) return;
 
-  function populateEditModal(event) {
-    event.preventDefault();
+    const aiButton = aiForm.querySelector('button, input[type="submit"]');
+    if (!aiButton) return;
 
-    const link = event.currentTarget;
-    const taskId = link.dataset.taskId;
-    const taskTitle = link.dataset.taskTitle;
-    const taskTime = link.dataset.taskTime;
-    const taskDuration = link.dataset.taskDuration;
-    const taskType = link.dataset.taskType;
-
-    // Update form action to point to the correct update route
-    const form = document.getElementById('editTaskForm');
-    form.action = `/schedules/<%= @schedule.id %>/tasks/${taskId}`;
-    form.method = 'POST';
-
-    // Add hidden method override for PUT/PATCH
-    let methodInput = form.querySelector('input[name="_method"]');
-    if (!methodInput) {
-      methodInput = document.createElement('input');
-      methodInput.type = 'hidden';
-      methodInput.name = '_method';
-      methodInput.value = 'PATCH';
-      form.appendChild(methodInput);
-    }
-
-    // Populate fields
-    document.querySelector('#editTaskForm #task_title').value = taskTitle;
-    document.querySelector('#editTaskForm #task_duration_min').value = taskDuration;
-
-    // Set time type radio button
-    if (taskType === 'fixed_time') {
-      document.querySelector('#edit_fixed_time').checked = true;
-    } else {
-      document.querySelector('#edit_preferred_time').checked = true;
-    }
-  }
-
-  function initializeTimeFieldToggle() {
-    const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
-    console.log('Found radios:', timeTypeRadios.length);
-
-    const fixedField = document.getElementById('fixedTimeField');
-    const preferredField = document.getElementById('preferredTimeField');
-
-    console.log('fixedField found:', !!fixedField);
-    console.log('preferredField found:', !!preferredField);
-
-    if (!fixedField || !preferredField || timeTypeRadios.length === 0) {
-      console.log('Elements not found, retrying...');
-      return;
-    }
-
-    function updateTimeFields() {
-      const selectedValue = Array.from(timeTypeRadios).find(r => r.checked)?.value;
-      console.log('Selected value:', selectedValue);
-
-      if (selectedValue === 'fixed_time') {
-        fixedField.style.display = 'block';
-        preferredField.style.display = 'none';
-        console.log('Showing fixed time field');
-      } else if (selectedValue === 'preferred_time') {
-        fixedField.style.display = 'none';
-        preferredField.style.display = 'block';
-        console.log('Showing preferred time field');
-      } else {
-        fixedField.style.display = 'none';
-        preferredField.style.display = 'none';
-        console.log('Hiding both fields');
-      }
-    }
-
-    timeTypeRadios.forEach(radio => {
-      radio.addEventListener('change', updateTimeFields);
+    aiForm.addEventListener('submit', function() {
+      aiButton.disabled = true;
+      aiButton.value    = 'Creating...';
+      aiButton.innerText = 'Creating...';
+      setTimeout(() => {
+        aiButton.disabled  = false;
+        aiButton.value     = 'Create task with ai ✨';
+        aiButton.innerText = 'Create task with ai ✨';
+      }, 8000);
     });
-
-    updateTimeFields();
-  }
-
-  document.addEventListener('DOMContentLoaded', initializeTimeFieldToggle);
-  document.addEventListener('turbo:load', initializeTimeFieldToggle);
-  document.addEventListener('shown.bs.modal', initializeTimeFieldToggle);
-
-  setTimeout(initializeTimeFieldToggle, 500);
+  });
 </script>

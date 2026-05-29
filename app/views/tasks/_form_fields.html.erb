@@ -1,0 +1,106 @@
+<!-- Task Name -->
+<div class="modal-form-group">
+  <label class="form-label" for="task_category">Task Name</label>
+  <input type="text" name="task[category]" id="task_category" class="form-control" placeholder="What's the task?">
+</div>
+
+<!-- Duration -->
+<div class="modal-form-group">
+  <label class="form-label" for="task_duration_min">Duration (minutes)</label>
+  <input type="number" name="task[duration_min]" id="task_duration_min" class="form-control" min="5" placeholder="e.g. 30">
+</div>
+
+<!-- Time Type -->
+<div class="modal-form-group">
+  <label class="form-label">Time Type</label>
+  <div class="time-type-options">
+    <div class="form-check">
+      <input type="radio" name="task[time_type]" value="fixed_time" class="form-check-input" id="<%= "#{prefix}_fixed_time" %>">
+      <label class="form-check-label" for="<%= "#{prefix}_fixed_time" %>">
+        Fixed Time (Must complete at this time)
+      </label>
+    </div>
+    <div class="form-check">
+      <input type="radio" name="task[time_type]" value="preferred_time" class="form-check-input" id="<%= "#{prefix}_preferred_time" %>">
+      <label class="form-check-label" for="<%= "#{prefix}_preferred_time" %>">
+        Preferred Time (Can adjust if needed)
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed Time -->
+<div class="modal-form-group" id="<%= "#{prefix}FixedTimeField" %>" style="display: none;">
+  <label class="form-label" for="task_fixed_time">Fixed Time</label>
+  <input type="time" name="task[fixed_time]" id="task_fixed_time" class="form-control">
+</div>
+
+<!-- Preferred Time -->
+<div class="modal-form-group" id="<%= "#{prefix}PreferredTimeField" %>" style="display: none;">
+  <label class="form-label" for="task_preferred_time">Preferred Time</label>
+  <input type="time" name="task[preferred_time]" id="task_preferred_time" class="form-control">
+</div>
+<!-- Task Name -->
+<div class="modal-form-group">
+  <label class="form-label" for="task_category">Task Name</label>
+  <input type="text" name="task[category]" id="task_category" class="form-control" placeholder="What's the task?">
+</div>
+
+<!-- Duration -->
+<div class="modal-form-group">
+  <label class="form-label" for="task_duration_min">Duration (minutes)</label>
+  <input type="number" name="task[duration_min]" id="task_duration_min" class="form-control" min="5" placeholder="e.g. 30">
+</div>
+
+<!-- Time Type -->
+<div class="modal-form-group">
+  <label class="form-label">Time Type</label>
+  <div class="time-type-options">
+    <div class="form-check">
+      <input type="radio" name="task[time_type]" value="fixed_time" class="form-check-input" id="<%= "#{prefix}_fixed_time" %>">
+      <label class="form-check-label" for="<%= "#{prefix}_fixed_time" %>">
+        Fixed Time (Must complete at this time)
+      </label>
+    </div>
+    <div class="form-check">
+      <input type="radio" name="task[time_type]" value="preferred_time" class="form-check-input" id="<%= "#{prefix}_preferred_time" %>">
+      <label class="form-check-label" for="<%= "#{prefix}_preferred_time" %>">
+        Preferred Time (Can adjust if needed)
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Fixed Time -->
+<div class="modal-form-group" id="<%= "#{prefix}FixedTimeField" %>" style="display: none;">
+  <label class="form-label" for="task_fixed_time">Fixed Time</label>
+  <input type="time" name="task[fixed_time]" id="task_fixed_time" class="form-control">
+</div>
+
+<!-- Preferred Time -->
+<div class="modal-form-group" id="<%= "#{prefix}PreferredTimeField" %>" style="display: none;">
+  <label class="form-label" for="task_preferred_time">Preferred Time</label>
+  <input type="time" name="task[preferred_time]" id="task_preferred_time" class="form-control">
+</div>
+
+<script>
+  (function() {
+    const fixedRadio     = document.getElementById('<%= "#{prefix}_fixed_time" %>');
+    const preferredRadio = document.getElementById('<%= "#{prefix}_preferred_time" %>');
+    const fixedField     = document.getElementById('<%= "#{prefix}FixedTimeField" %>');
+    const preferredField = document.getElementById('<%= "#{prefix}PreferredTimeField" %>');
+
+    if (!fixedRadio) return;
+
+    function toggle() {
+      fixedField.style.display     = fixedRadio.checked     ? 'block' : 'none';
+      preferredField.style.display = preferredRadio.checked ? 'block' : 'none';
+    }
+
+    fixedRadio.addEventListener('change', toggle);
+    preferredRadio.addEventListener('change', toggle);
+
+    // Also run on modal open
+    document.addEventListener('shown.bs.modal', toggle);
+  })();
+</script>
