@@ -49,10 +49,15 @@
 
             <div class="task-actions">
               <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#editTaskModal"
-                 data-task-id="<%= task.id %>" data-task-title="<%= task.title %>"
-                 data-task-time="<%= task.display_time %>" data-task-duration="<%= task.duration_min %>"
-                 data-task-type="<%= task.time_type %>" onclick="populateEditModal(event)">Edit</a>
+                data-task-id="<%= task.id %>" data-task-title="<%= task.title %>"
+                data-task-time="<%= task.display_time %>" data-task-duration="<%= task.duration_min %>"
+                data-task-type="<%= task.time_type %>" onclick="populateEditModal(event)">Edit</a>
               <%= button_to 'Delete', schedule_task_path(@schedule, task), method: :delete, data: { turbo_confirm: 'Remove task?' }, class: 'action-link delete', form_class: 'inline-delete-form' %>
+              <%= form_with url: schedule_task_path(@schedule, task), method: :patch, data: { turbo: false }, style: "display:inline" do %>
+                <input type="hidden" name="task[completed]" value="<%= task.completed ? 'false' : 'true' %>">
+                <input type="checkbox" class="task-toggle" id="toggle-<%= task.id %>" <%= task.completed ? 'checked' : '' %> onchange="this.form.submit()">
+                <label for="toggle-<%= task.id %>"></label>
+              <% end %>
             </div>
           </div>
         </div>
@@ -65,11 +70,6 @@
     <button type="button" class="btn-chat-aevi" data-bs-toggle="modal" data-bs-target="#exampleModal">
       💬 Chat to Aevi
     </button>
-  </div>
-
-  <!-- Back Link -->
-  <div class="footer-actions">
-    <%= link_to '← Back to Schedules', schedules_path, class: 'back-link' %>
   </div>
 </div>
 

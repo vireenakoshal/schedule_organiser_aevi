@@ -48,10 +48,15 @@ class TasksController < ApplicationController
   end
 
   def update
-    if @task.update(task_params)
-      redirect_to @schedule, notice: "Task updated successfully."
-    else
-      redirect_to @schedule, alert: "Error updating task."
+    if params[:task].present?
+      if @task.update(task_params)
+        redirect_to @schedule, notice: "Task updated successfully."
+      else
+        redirect_to @schedule, alert: "Error updating task."
+      end
+    elsif params[:completed].present?
+      @task.update(completed: params[:completed] == 'true')
+      redirect_to @schedule
     end
   end
 
@@ -66,7 +71,7 @@ class TasksController < ApplicationController
   end
 
   def task_params
-    permitted_params = params.require(:task).permit(:title, :duration_min, :time_type, :display_time)
+    permitted_params = params.require(:task).permit(:title, :duration_min, :time_type, :display_time, :completed)
 
     # Map time_type and display_time to fixed_time or preferred_time
     if permitted_params[:time_type].present? && permitted_params[:display_time].present?
