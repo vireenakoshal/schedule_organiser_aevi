@@ -12,8 +12,8 @@
       <p style="color: #999; font-size: 14px; margin: 4px 0 0 0;"><%= @schedule.date.strftime('%A, %B %d') %></p>
     </div>
 
-  <div class="header-buttons">
-    <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#optimizeModal">
+    <div class="header-buttons">
+      <button class="btn-optimize" data-bs-toggle="modal" data-bs-target="#exampleModal">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2v20M2 12h20"></path>
         </svg>
@@ -27,14 +27,14 @@
 
   <!-- Tasks Timeline -->
   <div class="tasks-timeline">
-    <% if @schedule.tasks.empty? %>
+    <% if @tasks.empty?%>
       <div class="empty-state">
         <p>No tasks yet. Add one to get started!</p>
       </div>
     <% else %>
       <div class="timeline-line"></div>
 
-      <% @schedule.tasks.each do |task| %>
+      <% @tasks.each do |task| %>
         <div class="timeline-item">
           <div class="timeline-dot"></div>
 
@@ -45,10 +45,13 @@
               <span class="task-badge <%= task.time_type %>"><%= task.time_badge %></span>
             </div>
 
-            <h3 class="task-title"><%= task.title %></h3>
+            <h3 class="task-title"><%= task.category %></h3>
 
             <div class="task-actions">
-              <%= link_to 'Edit', edit_schedule_task_path(@schedule, task), class: 'action-link' %>
+              <a href="#" class="action-link" data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                 data-task-id="<%= task.id %>" data-task-title="<%= task.title %>"
+                 data-task-time="<%= task.display_time %>" data-task-duration="<%= task.duration_min %>"
+                 data-task-type="<%= task.time_type %>" onclick="populateEditModal(event)">Edit</a>
               <%= button_to 'Delete', schedule_task_path(@schedule, task), method: :delete, data: { turbo_confirm: 'Remove task?' }, class: 'action-link delete', form_class: 'inline-delete-form' %>
             </div>
           </div>
@@ -57,13 +60,12 @@
     <% end %>
   </div>
 
-  <% last_plan = @schedule.messages.where(role: "assistant").last %>
-  <% if last_plan %>
-    <div style="background: white; border-left: 4px solid #d97c3a; border-radius: 8px; padding: 24px; margin-bottom: 40px;">
-      <p style="font-size: 12px; font-weight: 600; letter-spacing: 1px; color: #d97c3a; text-transform: uppercase; margin-bottom: 12px;">AI PLAN</p>
-      <%= simple_format last_plan.content %>
-    </div>
-  <% end %>
+  <!-- Chat to Aevi Button -->
+  <div style="text-align: center; margin: 50px 0;">
+    <button type="button" class="btn-chat-aevi" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      💬 Chat to Aevi
+    </button>
+  </div>
 
   <!-- Back Link -->
   <div class="footer-actions">
@@ -73,6 +75,9 @@
 
 <!-- Include the Add Task Modal -->
 <%= render 'add_task_modal', schedule: @schedule %>
+
+<!-- Include the Edit Task Modal -->
+<%= render 'edit_task_modal', schedule: @schedule %>
 
 <!-- Include the Optimize Schedule Modal (placeholder for now) -->
 <div class="modal fade" id="optimizeModal" tabindex="-1" aria-labelledby="optimizeModalLabel" aria-hidden="true">
@@ -172,6 +177,26 @@
   .btn-add-task:hover {
     background: #c26b2e;
     border-color: #c26b2e;
+  }
+
+  /* Chat to Aevi Button */
+  .btn-chat-aevi {
+    padding: 14px 40px;
+    background-color: #d97c3a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .btn-chat-aevi:hover {
+    background-color: #c26b2e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(217, 124, 58, 0.3);
   }
 
   /* Timeline */
@@ -276,6 +301,7 @@
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
+    cursor: pointer;
   }
 
   .action-link:hover {
@@ -355,10 +381,98 @@
   }
 </style>
 
-<script>
-  function initializeTimeFieldToggle() {
-    console.log('Initializing time field toggle...');
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
 
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Lets optimise your day together! chat with Aevi for inspiration</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <% user_message_count = @schedule.messages.where(role: "user").count %>
+
+          <% if user_message_count >= 20 %>
+            <div style="
+              background-color: #FFF3CD;
+              border: 1px solid #C1713A;
+              border-radius: 8px;
+              padding: 0.75rem 1rem;
+              margin-bottom: 1rem;
+              font-size: 0.85rem;
+              color: #7A6E63;
+              font-family: 'Arial', sans-serif;">
+              You've reached the 20 message limit for this schedule. Start a new schedule to keep chatting with Aevi.
+            </div>
+          <% end %>
+
+          <div id="messages" style="max-height: 350px; overflow-y: auto; margin-bottom: 1rem;">
+            <%= render @schedule.messages %>
+          </div>
+
+          <% unless user_message_count >= 10 %>
+          <div id="message_form">
+            <%= render "messages/form", schedule: @schedule, message: @message %>
+          </div>
+          <% end %>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener("turbo:after-stream-render", () => {
+    const messages = document.getElementById("messages");
+    if (messages) messages.scrollTop = messages.scrollHeight;
+  });
+
+  function populateEditModal(event) {
+    event.preventDefault();
+
+    const link = event.currentTarget;
+    const taskId = link.dataset.taskId;
+    const taskTitle = link.dataset.taskTitle;
+    const taskTime = link.dataset.taskTime;
+    const taskDuration = link.dataset.taskDuration;
+    const taskType = link.dataset.taskType;
+
+    // Update form action to point to the correct update route
+    const form = document.getElementById('editTaskForm');
+    form.action = `/schedules/<%= @schedule.id %>/tasks/${taskId}`;
+    form.method = 'POST';
+
+    // Add hidden method override for PUT/PATCH
+    let methodInput = form.querySelector('input[name="_method"]');
+    if (!methodInput) {
+      methodInput = document.createElement('input');
+      methodInput.type = 'hidden';
+      methodInput.name = '_method';
+      methodInput.value = 'PATCH';
+      form.appendChild(methodInput);
+    }
+
+    // Populate fields
+    document.querySelector('#editTaskForm #task_title').value = taskTitle;
+    document.querySelector('#editTaskForm #task_duration_min').value = taskDuration;
+
+    // Set time type radio button
+    if (taskType === 'fixed_time') {
+      document.querySelector('#edit_fixed_time').checked = true;
+    } else {
+      document.querySelector('#edit_preferred_time').checked = true;
+    }
+  }
+
+  function initializeTimeFieldToggle() {
     const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
     console.log('Found radios:', timeTypeRadios.length);
 

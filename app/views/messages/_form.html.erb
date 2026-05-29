@@ -1,0 +1,15 @@
+
+  <%= simple_form_for [schedule, message] do |f| %>
+    <div style="display: flex; gap: 0.5rem;">
+      <%= f.input :content,
+          label: false,
+          placeholder: "What should I do with my free time?",
+          input_html: {
+            style: "flex: 1; border: 1px solid #D9CFC2; border-radius: 8px; padding: 0.55rem 0.9rem; font-size: 0.85rem; outline: none;",
+            autocomplete: "off"
+          },
+          wrapper: false %>
+      <%= f.submit "Send",
+          style: "background-color: #C1713A; color: white; border: none; border-radius: 8px; padding: 0.55rem 1.1rem; font-size: 0.85rem; cursor: pointer;" %>
+    </div>
+  <% end %>

@@ -1,53 +1,39 @@
-<% # app/views/schedules/_add_task_modal.html.erb %>
-
-<!-- Modal -->
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="background-color: #D97E3B; color: white;">
         <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-
       <div class="modal-body">
-        <%= form_with model: [@schedule, Task.new], local: true do |f| %>
+        <div id="add-task-alert" class="alert alert-danger" style="display: none; margin-bottom: 15px;">
+          ⚠️ Please fill in all fields
+        </div>
+
+        <%= form_with model: [@schedule, Task.new], local: true, url: schedule_tasks_path(@schedule), method: :post do |form| %>
           <div class="mb-3">
-            <%= f.label :title, "Task Title", class: "form-label" %>
-            <%= f.text_field :title, placeholder: "e.g., Project Strategy Review", class: "form-control" %>
+            <%= form.label :name, "Task Name", class: "form-label" %>
+            <%= form.text_field :name, id: "task_name", class: "form-control", placeholder: "Enter task name" %>
           </div>
 
           <div class="mb-3">
-            <%= f.label :duration_min, "Duration (minutes)", class: "form-label" %>
-            <%= f.number_field :duration_min, placeholder: "60", class: "form-control" %>
+            <%= form.label :display_time, "Date", class: "form-label" %>
+            <%= form.date_field :display_time, id: "task_date", class: "form-control" %>
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Time Type</label>
-            <div>
-              <div class="form-check">
-                <%= f.radio_button :time_type, 'fixed_time', class: 'form-check-input' %>
-                <%= f.label :time_type_fixed_time, 'Fixed Time', class: 'form-check-label' %>
-              </div>
-              <div class="form-check">
-                <%= f.radio_button :time_type, 'preferred_time', class: 'form-check-input' %>
-                <%= f.label :time_type_preferred_time, 'Preferred Time (Flexible)', class: 'form-check-label' %>
-              </div>
-            </div>
+            <%= form.label :time_type, "Time Type", class: "form-label" %>
+            <%= form.select :time_type, { "Fixed Time" => "fixed_time", "Preferred Time" => "preferred_time" }, {}, id: "task_time_type", class: "form-select" %>
           </div>
 
-          <div class="mb-3" id="fixedTimeField" style="display: none;">
-            <%= f.label :fixed_time, "Fixed Time", class: "form-label" %>
-            <%= f.time_field :fixed_time, class: "form-control" %>
-          </div>
-
-          <div class="mb-3" id="preferredTimeField" style="display: none;">
-            <%= f.label :preferred_time, "Preferred Time", class: "form-label" %>
-            <%= f.time_field :preferred_time, class: "form-control" %>
+          <div class="mb-3">
+            <%= form.label :display_time, "Time", class: "form-label" %>
+            <%= form.time_field :display_time, id: "task_time", class: "form-control" %>
           </div>
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <%= f.submit "Add Task", class: "btn btn-primary" %>
+            <%= form.submit "Add Task", class: "btn btn-primary", style: "background-color: #D97E3B; border-color: #D97E3B;", onclick: "return validateAddTaskForm()" %>
           </div>
         <% end %>
       </div>
@@ -55,115 +41,25 @@
   </div>
 </div>
 
-<style>
-  .modal-content {
-    background: #f9f9f9;
-    border-radius: 12px;
-    border: 1px solid #e0e0e0;
-  }
-
-  .modal-header {
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
-  }
-
-  .modal-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: #2d2d2d;
-  }
-
-  .modal-body {
-    padding: 24px;
-  }
-
-  .form-label {
-    font-weight: 500;
-    color: #2d2d2d;
-    margin-bottom: 8px;
-  }
-
-  .form-control {
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .form-control:focus {
-    border-color: #d97c3a;
-    box-shadow: 0 0 0 2px rgba(217, 124, 58, 0.1);
-    outline: none;
-  }
-
-  .form-check {
-    margin-bottom: 12px;
-  }
-
-  .form-check-input {
-    margin-right: 8px;
-    cursor: pointer;
-  }
-
-  .form-check-label {
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .modal-footer {
-    border-top: 1px solid #e0e0e0;
-    background: white;
-  }
-
-  .btn-primary {
-    background: #d97c3a;
-    border-color: #d97c3a;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-  }
-
-  .btn-primary:hover {
-    background: #c26b2e;
-    border-color: #c26b2e;
-  }
-
-  .btn-secondary {
-    background: white;
-    border-color: #e0e0e0;
-    color: #2d2d2d;
-  }
-
-  .btn-secondary:hover {
-    background: #f9f9f9;
-    border-color: #d0d0d0;
-  }
-</style>
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const timeTypeRadios = document.querySelectorAll('input[name="task[time_type]"]');
+  function validateAddTaskForm() {
+    const taskName = document.getElementById('task_name').value.trim();
+    const taskDate = document.getElementById('task_date').value;
+    const taskTime = document.getElementById('task_time').value;
 
-    function updateTimeFields() {
-      const fixedField = document.getElementById('fixedTimeField');
-      const preferredField = document.getElementById('preferredTimeField');
-
-      const selectedValue = document.querySelector('input[name="task[time_type]"]:checked')?.value;
-
-      if (selectedValue === 'fixed_time') {
-        fixedField.style.display = 'block';
-        preferredField.style.display = 'none';
-      } else if (selectedValue === 'preferred_time') {
-        fixedField.style.display = 'none';
-        preferredField.style.display = 'block';
-      }
+    if (!taskName || !taskDate || !taskTime) {
+      const alertBox = document.getElementById('add-task-alert');
+      alertBox.style.display = 'block';
+      return false;
+    } else {
+      const alertBox = document.getElementById('add-task-alert');
+      alertBox.style.display = 'none';
+      return true;
     }
+  }
 
-    timeTypeRadios.forEach(radio => {
-      radio.addEventListener('change', updateTimeFields);
-    });
-
-    updateTimeFields();
+  // Hide alert when user starts typing
+  document.getElementById('task_name')?.addEventListener('input', function() {
+    document.getElementById('add-task-alert').style.display = 'none';
   });
 </script>

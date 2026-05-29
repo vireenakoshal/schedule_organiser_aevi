@@ -34,10 +34,14 @@ class SchedulesController < ApplicationController
   end
 
   def show
-    @tasks = @schedule.tasks.order(fixed_time: :asc)
-    @messages = @schedule.messages.order(created_at: :asc)
+  @tasks = @schedule.tasks.sort_by do |t|
+    time = t.fixed_time || t.preferred_time
+    time ? time.seconds_since_midnight : Float::INFINITY
   end
-
+  @messages = @schedule.messages.order(created_at: :asc)
+  @message = Message.new
+  end
+  
   def destroy
     @schedule.destroy
     redirect_to schedules_path, notice: "Schedule deleted successfully."
