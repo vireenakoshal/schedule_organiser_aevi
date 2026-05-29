@@ -7,6 +7,9 @@ Rails.application.routes.draw do
       collection do
         post :create_with_ai
       end
+      member do
+        patch :toggle_complete
+      end
     end
     resources :messages, only: [:create]
     resources :suggestions, only: [:new, :create]
