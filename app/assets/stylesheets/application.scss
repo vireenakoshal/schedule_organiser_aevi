@@ -10,6 +10,7 @@
 // Your CSS partials
 @import "components/index";
 @import "pages/index";
+@import "schedules";
 
 .task-toggle {
   position: absolute;
@@ -55,3 +56,4 @@
 .task-toggle:checked + label::after {
   left: 18px;
 }
+
