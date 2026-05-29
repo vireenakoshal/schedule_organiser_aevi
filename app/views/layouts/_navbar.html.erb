@@ -31,7 +31,7 @@
           </div>
 
           <!-- Logout Button -->
-          <%= link_to "Log out", destroy_user_session_path, data: { turbo_method: :delete }, class: "btn", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 8px 20px; border-radius: 6px;" %>
+          <%= button_to "Log out", destroy_user_session_path, method: :get, data: { turbo: false }, class: "btn", style: "background-color: #D97E3B; color: white; font-weight: 600; padding: 8px 20px; border-radius: 6px;" %>
         <% end %>
       </div>
     </div>

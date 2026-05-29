@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, sign_out_via: :get
   root "schedules#index"
 
   resources :schedules, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
