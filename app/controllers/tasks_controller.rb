@@ -83,6 +83,11 @@ class TasksController < ApplicationController
   end
 
   def update
+    if params[:completed].present?
+      @task.update(completed: params[:completed] == 'true')
+      redirect_to @schedule, notice: "Task updated successfully."
+    end
+    
     permitted = task_params
 
     if permitted[:preferred_time].present? && permitted[:fixed_time].blank?

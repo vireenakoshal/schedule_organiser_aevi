@@ -131,6 +131,11 @@
                     data: { turbo_confirm: 'Remove task?' },
                     class: 'action-link delete',
                     form_class: 'inline-delete-form' %>
+                <%= form_with url: schedule_task_path(@schedule, task), method: :patch, data: { turbo: false }, style: "display:inline" do %>
+                  <input type="hidden" name="task[completed]" value="<%= task.completed ? 'false' : 'true' %>">
+                  <input type="checkbox" class="task-toggle" id="toggle-<%= task.id %>" <%= task.completed ? 'checked' : '' %> onchange="this.form.submit()">
+                  <label for="toggle-<%= task.id %>"></label>
+                <% end %>
               </div>
             </div>
           </div>
